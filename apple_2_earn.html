@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Apple2Earn | APPLE</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#e53935;--glass: rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#071023 0%, #071726 100%);color:#e6eef6}
+    .wrap{max-width:980px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;gap:16px}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ffcc00,#ff7043);display:flex;align-items:center;justify-content:center;font-weight:700;color:#08202a}
+    h1{font-size:20px;margin:0}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(2,6,23,0.6);}
+    .small{color:var(--muted);font-size:13px}
+    .big{font-size:28px;font-weight:700;margin-top:6px}
+    .countdown{font-size:24px;font-weight:700}
+    .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .i{font-size:12px;color:var(--muted);margin-left:8px}
+    footer{text-align:center;padding:12px;color:var(--muted);font-size:13px;margin-top:18px}
+    button{background:var(--accent);border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer}
+    input[type=number]{width:120px;padding:8px;border-radius:8px;border:none}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">🍎</div>
+      <div>
+        <h1>Apple2Earn <span class="small">| APPLE</span></h1>
+        <div class="small">Next micro-drop every 10 minutes. Apples = floor($APPLE / 100,000)</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <div class="card">
+          <div class="row">
+            <div>
+              <div class="small">NEXT DROP</div>
+              <div class="countdown" id="countdown">--:--</div>
+            </div>
+            <div>
+              <div class="small">Total Apples</div>
+              <div class="big" id="totalApples">0</div>
+            </div>
+          </div>
+
+          <hr style="margin:14px 0;border:0;border-top:1px solid rgba(255,255,255,0.03)">
+
+          <div class="row">
+            <div>
+              <div class="small">Reward Pool (USD APPLE)</div>
+              <div class="big" id="rewardPool">$0</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small">Est per APPLE</div>
+              <div class="big" id="estPerApple">$0</div>
+            </div>
+          </div>
+
+          <p class="small" style="margin-top:12px">How it works: Every 10 minutes, accrued creator rewards are used to buy back $APPLE and distribute it to holders proportionally to their APPLE balance. This demo uses manual inputs — replace with live data if you connect an API.</p>
+
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <label class="small">Your $APPLE: <input id="userApple" type="number" value="0" min="0"></label>
+            <label class="small">Total $APPLE supply (for snapshot): <input id="supplyApple" type="number" value="1000000" min="1"></label>
+            <button id="calcBtn">Calculate</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <table>
+              <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td class="small">Your APPLEs</td><td id="yourApples">0</td></tr>
+                <tr><td class="small">Your Share</td><td id="yourShare">0%</td></tr>
+                <tr><td class="small">Est Drop for You</td><td id="yourDrop">$0</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h3 style="margin:0">Apelist</h3>
+          <div class="small">Top holders (demo)</div>
+          <div id="apelist" style="margin-top:8px">No data — connect a real holder API to populate.</div>
+        </div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <div class="small">Cycle Length</div>
+          <div class="big">10 min</div>
+          <div class="small i">New drop at :00, :10, :20, :30, :40, :50</div>
+          <hr style="margin:12px 0;border:0;border-top:1px solid rgba(255,255,255,0.03)">
+          <div class="small">Market Cap</div>
+          <div class="big" id="marketCap">$0</div>
+          <p class="small">Note: This page is a demo clone inspired by a common "drop" mechanic. Replace numbers with real on‑chain data for production.</p>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 style="margin:0">How to use</h4>
+          <ol class="small">
+            <li>Enter current $APPLE balances and supply, click Calculate.</li>
+            <li>Watch the countdown to see next snapshot window.</li>
+            <li>Connect an on‑chain API or indexer to replace demo inputs with live data.</li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <footer>(c) 2025 Apple2Earn — Demo site. Not financial advice.</footer>
+  </div>
+
+  <script>
+    // Countdown to next 10-min mark
+    function updateCountdown(){
+      const now = new Date();
+      const mins = now.getUTCMinutes();
+      const next = Math.ceil((mins+0.000001)/10)*10; // next multiple of 10
+      const nextDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), next, 0));
+      if(next>=60){ nextDate.setUTCHours(nextDate.getUTCHours()+1); nextDate.setUTCMinutes(0); }
+      const diff = nextDate - now;
+      if(diff<=0){ document.getElementById('countdown').textContent = '00:00'; return; }
+      const mm = Math.floor(diff/60000).toString().padStart(2,'0');
+      const ss = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+      document.getElementById('countdown').textContent = mm+':'+ss;
+    }
+    setInterval(updateCountdown, 1000); updateCountdown();
+
+    // Simple calculations
+    function calc(){
+      const user = Number(document.getElementById('userApple').value) || 0;
+      const supply = Number(document.getElementById('supplyApple').value) || 1;
+      // Demo reward pool (hardcoded or could be set by API)
+      const rewardPool = 5000; // USD value
+      document.getElementById('rewardPool').textContent = '$'+rewardPool.toLocaleString();
+      document.getElementById('marketCap').textContent = '$'+(supply*0.01).toLocaleString();
+
+      const yourApples = Math.floor(user/100000);
+      const totalApples = Math.floor(supply/100000);
+      document.getElementById('yourApples').textContent = yourApples;
+      document.getElementById('totalApples').textContent = totalApples;
+      document.getElementById('yourShare').textContent = totalApples>0?((yourApples/totalApples*100).toFixed(3)+'%'):'0%';
+
+      const estPer = totalApples>0?rewardPool/totalApples:0;
+      document.getElementById('estPerApple').textContent = '$'+estPer.toFixed(2);
+      const yourDrop = estPer*yourApples;
+      document.getElementById('yourDrop').textContent = '$'+yourDrop.toFixed(2);
+    }
+    document.getElementById('calcBtn').addEventListener('click',calc);
+    calc();
+  </script>
+</body>
+</html>
