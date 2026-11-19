@@ -1,0 +1,3297 @@
+<roblox version="4">
+  <Item class="ReplicatedStorage" referent="0">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="1">
+      <Properties>
+        <string name="Name">Shared</string>
+      </Properties>
+      <Item class="ModuleScript" referent="2">
+        <Properties>
+          <string name="Name">Config</string>
+          <string name="Source"><![CDATA[--!strict
+-- Apple Ape: every tunable number lives here. Server and client both read this module.
+-- Change values, rebuild, playtest. Keep secrets (anti-cheat thresholds) server-side only if this grows.
+
+local RunService = game:GetService("RunService")
+
+local Config = {}
+
+Config.GameName = "Apple Ape"
+
+-- Basket = how many regular apples you can carry before selling.
+Config.Basket = {
+	baseCapacity = 25,
+	capacityPerLevel = 15,
+	maxLevel = 25,
+	baseCost = 15,
+	costGrowth = 1.55,
+}
+
+-- Shake = how many apples burst out of a tree per shake.
+Config.Shake = {
+	cooldown = 0.45, -- seconds between shakes (server enforces)
+	range = 16, -- studs from trunk you must be within
+	baseApples = 3,
+	applesPerLevel = 1,
+	maxLevel = 25,
+	baseCost = 25,
+	costGrowth = 1.7,
+	goldenChance = 0.03, -- chance that one apple in a shake is golden
+}
+
+Config.Apple = {
+	coinValue = 1, -- coins per regular apple when sold
+	lifetime = 25, -- seconds an uncollected apple stays on the ground
+	landMinRadius = 4,
+	landMaxRadius = 9,
+	magnetRadius = 7, -- client: apples within this distance fly to you
+	serverCollectRadius = 14, -- server tolerance (magnet + latency)
+	maxPerCollectRequest = 40,
+}
+
+-- First-time experience (blueprint R1-R3): first shake is huge and guaranteed golden.
+Config.Tutorial = {
+	firstShakeMultiplier = 10,
+}
+
+-- The Apple Drop (blueprint signature twist). Aligned to UTC :00, :10, :20 ...
+Config.Drop = {
+	intervalSeconds = 600,
+	studioIntervalSeconds = 120, -- shorter cycle when testing in Studio
+	rainDuration = 30,
+	rainSpawnEvery = 0.15, -- seconds between rain apples
+	rainGoldenChance = 0.06,
+	plazaCenter = Vector3.new(0, 0, 70),
+	plazaRadius = 22,
+}
+
+function Config.dropInterval(): number
+	if RunService:IsStudio() then
+		return Config.Drop.studioIntervalSeconds
+	end
+	return Config.Drop.intervalSeconds
+end
+
+-- World layout (studs). Ground top surface is at Y = 0.
+Config.World = {
+	spawn = Vector3.new(0, 0, -18),
+	sellPad = Vector3.new(-38, 0, -6),
+	trees = {
+		Vector3.new(-9, 0, 16),
+		Vector3.new(9, 0, 16),
+		Vector3.new(-27, 0, 22),
+		Vector3.new(27, 0, 22),
+		Vector3.new(-14, 0, 38),
+		Vector3.new(14, 0, 38),
+	},
+}
+
+Config.Colors = {
+	apple = Color3.fromRGB(226, 38, 38),
+	golden = Color3.fromRGB(255, 205, 40),
+	leaf = Color3.fromRGB(76, 175, 80),
+	leafDark = Color3.fromRGB(46, 125, 50),
+	trunk = Color3.fromRGB(121, 85, 58),
+	grass = Color3.fromRGB(110, 190, 90),
+	coin = Color3.fromRGB(255, 196, 0),
+	ui = Color3.fromRGB(28, 32, 48),
+	uiStroke = Color3.fromRGB(14, 16, 26),
+	white = Color3.fromRGB(255, 255, 255),
+	good = Color3.fromRGB(70, 200, 90),
+	bad = Color3.fromRGB(235, 70, 70),
+}
+
+-- Built-in Studio sounds so the prototype works with no uploads.
+-- Swap for your own asset ids ("rbxassetid://123") later; a bad id just stays silent.
+Config.Sounds = {
+	shake = "rbxasset://sounds/swoosh.wav",
+	pop = "rbxasset://sounds/electronicpingshort.wav",
+	golden = "rbxasset://sounds/electronicpingshort.wav",
+	click = "rbxasset://sounds/button.wav",
+	sell = "rbxasset://sounds/electronicpingshort.wav",
+	error = "rbxasset://sounds/button.wav",
+}
+
+-- Cost for buying the NEXT level when you are at `level` (levels start at 1).
+function Config.upgradeCost(kind: string, level: number): number
+	local def = if kind == "Basket" then Config.Basket else Config.Shake
+	return math.floor(def.baseCost * def.costGrowth ^ (level - 1))
+end
+
+function Config.capacity(basketLevel: number): number
+	return Config.Basket.baseCapacity + (basketLevel - 1) * Config.Basket.capacityPerLevel
+end
+
+function Config.applesPerShake(shakeLevel: number): number
+	return Config.Shake.baseApples + (shakeLevel - 1) * Config.Shake.applesPerLevel
+end
+
+function Config.maxLevel(kind: string): number
+	return if kind == "Basket" then Config.Basket.maxLevel else Config.Shake.maxLevel
+end
+
+-- Tutorial steps (also used as AnalyticsService onboarding funnel steps).
+Config.TutorialSteps = {
+	Joined = 1,
+	FirstShake = 2,
+	FirstCollect = 3,
+	BasketFull = 4,
+	FirstSell = 5,
+	FirstUpgrade = 6,
+	SawAppleDrop = 7,
+}
+Config.TutorialStepNames = {
+	"Joined",
+	"FirstShake",
+	"FirstCollect",
+	"BasketFull",
+	"FirstSell",
+	"FirstUpgrade",
+	"SawAppleDrop",
+}
+
+return Config
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="3">
+        <Properties>
+          <string name="Name">Format</string>
+          <string name="Source"><![CDATA[--!strict
+-- Number formatting shared by HUD and billboards (blueprint U8: readable numbers).
+
+local Format = {}
+
+local SUFFIXES = { "", "K", "M", "B", "T", "Qa", "Qi" }
+
+function Format.short(n: number): string
+	n = math.floor(n)
+	if math.abs(n) < 1000 then
+		return tostring(n)
+	end
+	local i = 1
+	local value = n
+	while math.abs(value) >= 1000 and i < #SUFFIXES do
+		value /= 1000
+		i += 1
+	end
+	local text = if math.abs(value) < 10 then string.format("%.2f", value) else string.format("%.1f", value)
+	text = text:gsub("%.?0+$", "")
+	return text .. SUFFIXES[i]
+end
+
+function Format.clock(seconds: number): string
+	seconds = math.max(0, math.floor(seconds))
+	return string.format("%d:%02d", seconds // 60, seconds % 60)
+end
+
+return Format
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="4">
+        <Properties>
+          <string name="Name">Remotes</string>
+          <string name="Source"><![CDATA[--!strict
+-- Single place that defines every RemoteEvent. The server creates them; clients wait for them.
+-- Client -> Server remotes carry INTENT only. The server validates and decides outcomes.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local NAMES = {
+	-- client -> server
+	"Shake", -- (treeId: number)
+	"Collect", -- (appleIds: {number})
+	"BuyUpgrade", -- (kind: "Basket" | "Shake")
+	-- server -> client
+	"ShakeResult", -- (treeId, apples: {AppleInfo}, info)
+	"TreeShaken", -- (treeId, userId) broadcast so everyone sees the tree wobble
+	"CollectResult", -- (collectedIds, goldenGained, reason?)
+	"ApplesSpawned", -- (apples: {AppleInfo}) shared apples (Apple Rain)
+	"ApplesRemoved", -- (ids) shared apples taken by someone
+	"Notify", -- (kind: string, data: any)
+}
+
+local folder: Folder
+if RunService:IsServer() then
+	local existing = ReplicatedStorage:FindFirstChild("Remotes")
+	if existing then
+		folder = existing :: Folder
+	else
+		folder = Instance.new("Folder")
+		folder.Name = "Remotes"
+		folder.Parent = ReplicatedStorage
+	end
+	for _, name in NAMES do
+		if not folder:FindFirstChild(name) then
+			local remote = Instance.new("RemoteEvent")
+			remote.Name = name
+			remote.Parent = folder
+		end
+	end
+else
+	folder = ReplicatedStorage:WaitForChild("Remotes") :: Folder
+end
+
+local Remotes: { [string]: RemoteEvent } = {}
+for _, name in NAMES do
+	Remotes[name] = folder:WaitForChild(name) :: RemoteEvent
+end
+
+return Remotes
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="5">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Folder" referent="6">
+      <Properties>
+        <string name="Name">Server</string>
+      </Properties>
+      <Item class="ModuleScript" referent="7">
+        <Properties>
+          <string name="Name">Analytics</string>
+          <string name="Source"><![CDATA[--!strict
+-- Thin, crash-proof wrapper around AnalyticsService (blueprint D6).
+-- Funnel steps show in Creator Dashboard > Analytics > Funnels; economy in > Economy.
+
+local AnalyticsService = game:GetService("AnalyticsService")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+
+local Analytics = {}
+
+function Analytics.onboardingStep(player: Player, step: number)
+	local name = Config.TutorialStepNames[step]
+	pcall(function()
+		AnalyticsService:LogOnboardingFunnelStepEvent(player, step, name)
+	end)
+end
+
+-- flow: "Source" (earned) or "Sink" (spent). transactionType: Enum.AnalyticsEconomyTransactionType name.
+function Analytics.economy(
+	player: Player,
+	flow: "Source" | "Sink",
+	currency: string,
+	amount: number,
+	endingBalance: number,
+	transactionType: string,
+	itemSku: string?
+)
+	if amount <= 0 then
+		return
+	end
+	pcall(function()
+		local flowType = if flow == "Source"
+			then Enum.AnalyticsEconomyFlowType.Source
+			else Enum.AnalyticsEconomyFlowType.Sink
+		AnalyticsService:LogEconomyEvent(player, flowType, currency, amount, endingBalance, transactionType, itemSku)
+	end)
+end
+
+function Analytics.custom(player: Player, eventName: string, value: number?)
+	pcall(function()
+		AnalyticsService:LogCustomEvent(player, eventName, value or 1)
+	end)
+end
+
+return Analytics
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="8">
+        <Properties>
+          <string name="Name">AppleDrop</string>
+          <string name="Source"><![CDATA[--!strict
+-- The Apple Drop (blueprint signature twist), prototype version:
+-- every cycle (10 min live, 2 min in Studio, aligned to UTC) apples rain on the plaza for 30s
+-- and anyone can grab them. The shared contribution pool + golden payout come in Phase B.
+--
+-- Clients read two Workspace attributes for the countdown:
+--   NextDropAt (unix seconds, server time) and RainEndsAt (0 when not raining).
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Remotes = require(Shared.Remotes)
+local Apples = require(script.Parent.Apples)
+local PlayerState = require(script.Parent.PlayerState)
+local PlayerData = require(script.Parent.PlayerData)
+
+local AppleDrop = {}
+
+local rng = Random.new()
+
+local function nextBoundary(now: number): number
+	local interval = Config.dropInterval()
+	return (math.floor(now / interval) + 1) * interval
+end
+
+local function rain()
+	local endsAt = Workspace:GetServerTimeNow() + Config.Drop.rainDuration
+	Workspace:SetAttribute("RainEndsAt", endsAt)
+	Remotes.Notify:FireAllClients("RainStarted", { endsAt = endsAt })
+	for _, player in Players:GetPlayers() do
+		-- only count it as the final onboarding step for players who finished the earlier ones;
+		-- otherwise reachStep would back-fill steps they never did and corrupt the funnel
+		local data = PlayerData.get(player)
+		if data and data.tutorialStep >= Config.TutorialSteps.FirstUpgrade then
+			PlayerState.reachStep(player, Config.TutorialSteps.SawAppleDrop)
+		end
+	end
+
+	local center = Config.Drop.plazaCenter
+	local radius = Config.Drop.plazaRadius - 2
+	while Workspace:GetServerTimeNow() < endsAt do
+		-- spawn a small batch each tick so the network stays light
+		local landings, golden = {}, {}
+		for i = 1, 3 do
+			local angle = rng:NextNumber(0, math.pi * 2)
+			local r = radius * math.sqrt(rng:NextNumber())
+			landings[i] = center + Vector3.new(math.cos(angle) * r, 0.6, math.sin(angle) * r)
+			golden[i] = rng:NextNumber() < Config.Drop.rainGoldenChance
+		end
+		Apples.spawnShared(landings, golden)
+		task.wait(Config.Drop.rainSpawnEvery * 3)
+	end
+	Workspace:SetAttribute("RainEndsAt", 0)
+	Remotes.Notify:FireAllClients("RainEnded", {})
+end
+
+function AppleDrop.init()
+	Workspace:SetAttribute("RainEndsAt", 0)
+	task.spawn(function()
+		while true do
+			local now = Workspace:GetServerTimeNow()
+			local at = nextBoundary(now)
+			Workspace:SetAttribute("NextDropAt", at)
+			task.wait(math.max(0.05, at - Workspace:GetServerTimeNow()))
+			Workspace:SetAttribute("NextDropAt", nextBoundary(Workspace:GetServerTimeNow() + 1))
+			rain()
+		end
+	end)
+end
+
+return AppleDrop
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="9">
+        <Properties>
+          <string name="Name">Apples</string>
+          <string name="Source"><![CDATA[--!strict
+-- Server-authoritative apples. The server decides where every apple lands and who may take it;
+-- clients only render apples and send "I want these ids". (roblox-networking: client sends intent.)
+--
+-- Personal apples (from your own shake) can only be collected by you.
+-- Shared apples (Apple Rain) can be collected by anyone, first come first served.
+
+local Players = game:GetService("Players")
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Remotes = require(Shared.Remotes)
+local PlayerData = require(script.Parent.PlayerData)
+local PlayerState = require(script.Parent.PlayerState)
+local Analytics = require(script.Parent.Analytics)
+local RateLimiter = require(script.Parent.RateLimiter)
+
+export type AppleInfo = { id: number, position: Vector3, golden: boolean }
+
+type Record = {
+	id: number,
+	owner: number?, -- UserId, or nil for shared apples
+	position: Vector3,
+	golden: boolean,
+	expires: number,
+}
+
+local Apples = {}
+
+local records: { [number]: Record } = {}
+local nextId = 0
+local collectLimiter = RateLimiter.new({ capacity = 30, refillRate = 20, defaultMinInterval = 0.05 })
+
+local function newRecord(owner: number?, position: Vector3, golden: boolean): Record
+	nextId += 1
+	local rec: Record = {
+		id = nextId,
+		owner = owner,
+		position = position,
+		golden = golden,
+		expires = os.clock() + Config.Apple.lifetime,
+	}
+	records[rec.id] = rec
+	return rec
+end
+
+-- Create apples that only `player` can collect. Returns the info the client needs to render them.
+function Apples.spawnPersonal(player: Player, landings: { Vector3 }, goldenIndex: number?): { AppleInfo }
+	local infos = {}
+	for i, pos in landings do
+		local rec = newRecord(player.UserId, pos, i == goldenIndex)
+		table.insert(infos, { id = rec.id, position = rec.position, golden = rec.golden })
+	end
+	return infos
+end
+
+-- Create apples anyone can collect, and tell every client to render them.
+function Apples.spawnShared(landings: { Vector3 }, goldenFlags: { boolean }?): { AppleInfo }
+	local infos = {}
+	for i, pos in landings do
+		local rec = newRecord(nil, pos, if goldenFlags then goldenFlags[i] == true else false)
+		table.insert(infos, { id = rec.id, position = rec.position, golden = rec.golden })
+	end
+	Remotes.ApplesSpawned:FireAllClients(infos)
+	return infos
+end
+
+local function rootPosition(player: Player): Vector3?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+	return root and root.Position
+end
+
+local function onCollect(player: Player, ids: any)
+	-- argument validation: a list of up to N integer ids
+	if type(ids) ~= "table" then
+		return
+	end
+	local count = #ids
+	if count == 0 or count > Config.Apple.maxPerCollectRequest then
+		return
+	end
+	if not collectLimiter:canPerform(player, "collect") then
+		return
+	end
+	local data = PlayerData.get(player)
+	local rootPos = rootPosition(player)
+	if not data or not rootPos then
+		return
+	end
+
+	local capacity = Config.capacity(data.basketLevel)
+	local collected: { number } = {}
+	local sharedTaken: { number } = {}
+	local goldenGained = 0
+	local regularGained = 0
+	local reason: string? = nil
+	local now = os.clock()
+
+	for i = 1, count do
+		local id = ids[i]
+		if type(id) ~= "number" or id % 1 ~= 0 then
+			continue
+		end
+		local rec = records[id]
+		if not rec or rec.expires < now then
+			continue
+		end
+		if rec.owner ~= nil and rec.owner ~= player.UserId then
+			continue
+		end
+		if (rec.position - rootPos).Magnitude > Config.Apple.serverCollectRadius then
+			reason = reason or "far"
+			continue
+		end
+		if rec.golden then
+			goldenGained += 1
+		elseif data.basket + regularGained < capacity then
+			regularGained += 1
+		else
+			reason = "full"
+			continue
+		end
+		records[id] = nil
+		table.insert(collected, id)
+		if rec.owner == nil then
+			table.insert(sharedTaken, id)
+		end
+	end
+
+	if #collected == 0 then
+		if reason then
+			Remotes.CollectResult:FireClient(player, collected, 0, reason)
+		end
+		return
+	end
+
+	data.basket += regularGained
+	data.golden += goldenGained
+	data.totalApples += regularGained + goldenGained
+	PlayerState.sync(player)
+	PlayerState.reachStep(player, Config.TutorialSteps.FirstCollect)
+	if goldenGained > 0 then
+		Analytics.economy(player, "Source", "GoldenApples", goldenGained, data.golden, "Gameplay", "GoldenApplePickup")
+	end
+	if data.basket >= capacity then
+		reason = "full"
+		PlayerState.reachStep(player, Config.TutorialSteps.BasketFull)
+	end
+
+	Remotes.CollectResult:FireClient(player, collected, goldenGained, reason)
+	if #sharedTaken > 0 then
+		Remotes.ApplesRemoved:FireAllClients(sharedTaken, player.UserId)
+	end
+end
+
+function Apples.init()
+	Remotes.Collect.OnServerEvent:Connect(onCollect)
+
+	-- expire old apples and forget apples of players who left
+	task.spawn(function()
+		while true do
+			task.wait(2)
+			local now = os.clock()
+			local online: { [number]: boolean } = {}
+			for _, p in Players:GetPlayers() do
+				online[p.UserId] = true
+			end
+			for id, rec in records do
+				if rec.expires < now or (rec.owner ~= nil and not online[rec.owner]) then
+					records[id] = nil
+				end
+			end
+		end
+	end)
+end
+
+return Apples
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="10">
+        <Properties>
+          <string name="Name">Economy</string>
+          <string name="Source"><![CDATA[--!strict
+-- Selling (step on the sell pad) and coin upgrades. All prices and grants are server-side.
+
+local Players = game:GetService("Players")
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Remotes = require(Shared.Remotes)
+local PlayerData = require(script.Parent.PlayerData)
+local PlayerState = require(script.Parent.PlayerState)
+local Analytics = require(script.Parent.Analytics)
+local RateLimiter = require(script.Parent.RateLimiter)
+
+local Economy = {}
+
+local buyLimiter = RateLimiter.new({ capacity = 8, refillRate = 4, defaultMinInterval = 0.1 })
+local lastSell: { [Player]: number } = {}
+
+local function sell(player: Player)
+	local now = os.clock()
+	if lastSell[player] and now - lastSell[player] < 0.5 then
+		return
+	end
+	lastSell[player] = now
+	local data = PlayerData.get(player)
+	if not data or data.basket <= 0 then
+		return
+	end
+	local apples = data.basket
+	local earned = apples * Config.Apple.coinValue
+	data.basket = 0
+	data.coins += earned
+	PlayerState.sync(player)
+	PlayerState.reachStep(player, Config.TutorialSteps.FirstSell)
+	Analytics.economy(player, "Source", "Coins", earned, data.coins, "Gameplay", "SellApples")
+	Remotes.Notify:FireClient(player, "Sold", { apples = apples, coins = earned })
+end
+
+local function onBuyUpgrade(player: Player, kind: any)
+	if kind ~= "Basket" and kind ~= "Shake" then
+		return
+	end
+	if not buyLimiter:canPerform(player, "buy") then
+		return
+	end
+	local data = PlayerData.get(player)
+	if not data then
+		return
+	end
+	local level = if kind == "Basket" then data.basketLevel else data.shakeLevel
+	if level >= Config.maxLevel(kind) then
+		Remotes.Notify:FireClient(player, "MaxLevel", { kind = kind })
+		return
+	end
+	local cost = Config.upgradeCost(kind, level)
+	if data.coins < cost then
+		Remotes.Notify:FireClient(player, "NotEnoughCoins", { need = cost - data.coins })
+		return
+	end
+	data.coins -= cost
+	if kind == "Basket" then
+		data.basketLevel += 1
+	else
+		data.shakeLevel += 1
+	end
+	PlayerState.sync(player)
+	PlayerState.reachStep(player, Config.TutorialSteps.FirstUpgrade)
+	Analytics.economy(player, "Sink", "Coins", cost, data.coins, "Shop", kind .. "Upgrade")
+	Remotes.Notify:FireClient(player, "Upgraded", { kind = kind, level = level + 1 })
+end
+
+function Economy.init(sellPad: BasePart)
+	sellPad.Touched:Connect(function(hit)
+		local character = hit:FindFirstAncestorOfClass("Model")
+		local player = character and Players:GetPlayerFromCharacter(character)
+		if player then
+			sell(player)
+		end
+	end)
+	Remotes.BuyUpgrade.OnServerEvent:Connect(onBuyUpgrade)
+	Players.PlayerRemoving:Connect(function(player)
+		lastSell[player] = nil
+	end)
+end
+
+return Economy
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="Script" referent="11">
+        <Properties>
+          <string name="Name">Main</string>
+          <token name="RunContext">0</token>
+          <string name="Source"><![CDATA[-- Apple Ape server entry point. Order matters: world first, then systems that use it.
+
+local World = require(script.Parent.World)
+local PlayerState = require(script.Parent.PlayerState)
+local Apples = require(script.Parent.Apples)
+local Trees = require(script.Parent.Trees)
+local Economy = require(script.Parent.Economy)
+local AppleDrop = require(script.Parent.AppleDrop)
+
+local map = World.build()
+Apples.init()
+Trees.init(map.trees)
+Economy.init(map.sellPad)
+AppleDrop.init()
+PlayerState.init() -- last: starts loading players once every system is listening
+
+print("[Apple Ape] server ready")
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="12">
+        <Properties>
+          <string name="Name">PlayerData</string>
+          <string name="Source"><![CDATA[--!strict
+-- Player save data with a session lock stored in the SAME key as the data, so the
+-- ownership check and the write happen in one UpdateAsync (roblox-datastores skill guidance).
+--
+-- Studio: if "Enable Studio Access to API Services" is off, data stays in memory only
+-- (you'll see a warning) so the prototype is still playable.
+
+local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local STORE_NAME = "AppleApe_PlayerData_v1"
+local SCHEMA_VERSION = 1
+local LEASE_SECONDS = 150 -- a lock older than this is treated as abandoned (crashed server)
+local AUTOSAVE_SECONDS = 45 -- must stay well under the lease
+local LOAD_RETRY_SECONDS = 6
+
+export type Data = {
+	schema: number,
+	coins: number,
+	basket: number, -- regular apples currently carried
+	golden: number,
+	basketLevel: number,
+	shakeLevel: number,
+	tutorialStep: number,
+	totalApples: number,
+	totalShakes: number,
+}
+
+type Session = { jobId: string, token: string, renewedAt: number }
+type Stored = { data: Data, session: Session? }
+
+local function defaults(): Data
+	return {
+		schema = SCHEMA_VERSION,
+		coins = 0,
+		basket = 0,
+		golden = 0,
+		basketLevel = 1,
+		shakeLevel = 1,
+		tutorialStep = 0,
+		totalApples = 0,
+		totalShakes = 0,
+	}
+end
+
+local function reconcile(saved: any): Data
+	local data = defaults()
+	if type(saved) == "table" then
+		for key, value in pairs(data) do
+			local v = saved[key]
+			if type(v) == type(value) and v == v then -- reject NaN
+				(data :: any)[key] = v
+			end
+		end
+	end
+	data.schema = SCHEMA_VERSION
+	return data
+end
+
+local PlayerData = {}
+
+local profiles: { [Player]: { data: Data, token: string, active: boolean } } = {}
+local memoryOnly = false
+local store: DataStore? = nil
+
+do
+	local ok, result = pcall(function()
+		return DataStoreService:GetDataStore(STORE_NAME)
+	end)
+	if ok then
+		store = result
+	else
+		memoryOnly = true
+		warn("[PlayerData] DataStores unavailable, using memory only:", result)
+	end
+end
+
+local function keyFor(player: Player): string
+	return "player/" .. tostring(player.UserId)
+end
+
+-- Try to acquire the session lock and read data in one atomic UpdateAsync.
+-- Returns: "ok", data | "locked", nil | "error", message
+local function tryAcquire(player: Player, token: string): (string, any)
+	local s = store :: DataStore
+	local outcome = "error"
+	local loaded: Data? = nil
+	local ok, err = pcall(function()
+		s:UpdateAsync(keyFor(player), function(old: any, _keyInfo)
+			local stored: Stored = if type(old) == "table" and type(old.data) == "table"
+				then old
+				else { data = defaults(), session = nil }
+			local session = stored.session
+			local now = os.time()
+			if session and session.token ~= token and now - session.renewedAt < LEASE_SECONDS then
+				outcome = "locked"
+				return nil -- cancel write: someone else owns this profile
+			end
+			stored.data = reconcile(stored.data)
+			stored.session = { jobId = game.JobId, token = token, renewedAt = now }
+			outcome = "ok"
+			loaded = stored.data
+			return stored, { player.UserId }
+		end)
+	end)
+	if not ok then
+		return "error", err
+	end
+	return outcome, loaded
+end
+
+function PlayerData.load(player: Player): Data?
+	local token = HttpService:GenerateGUID(false)
+	if memoryOnly then
+		local data = defaults()
+		profiles[player] = { data = data, token = token, active = true }
+		return data
+	end
+
+	local deadline = os.clock() + LEASE_SECONDS + 10
+	while player.Parent and os.clock() < deadline do
+		local status, result = tryAcquire(player, token)
+		if status == "ok" then
+			profiles[player] = { data = result, token = token, active = true }
+			return result
+		elseif status == "error" then
+			local message = tostring(result)
+			if RunService:IsStudio() and (message:find("403") or message:find("Studio")) then
+				warn("[PlayerData] Studio API access is off: playing with memory-only data.")
+				memoryOnly = true
+				local data = defaults()
+				profiles[player] = { data = data, token = token, active = true }
+				return data
+			end
+			warn("[PlayerData] load error for", player.UserId, message)
+		end
+		task.wait(LOAD_RETRY_SECONDS)
+	end
+	return nil
+end
+
+function PlayerData.get(player: Player): Data?
+	local profile = profiles[player]
+	return if profile and profile.active then profile.data else nil
+end
+
+-- Save; when `release` is true the session lock is cleared (player leaving).
+-- Returns "committed" | "lost_ownership" | "unknown" | "skipped".
+function PlayerData.save(player: Player, release: boolean?): string
+	local profile = profiles[player]
+	if not profile or not profile.active then
+		return "skipped"
+	end
+	if memoryOnly then
+		return "skipped"
+	end
+	local s = store :: DataStore
+	local snapshot = table.clone(profile.data)
+	local result = "unknown"
+	local ok, err = pcall(function()
+		s:UpdateAsync(keyFor(player), function(old: any, _keyInfo)
+			if type(old) ~= "table" or type(old.session) ~= "table" or old.session.token ~= profile.token then
+				result = "lost_ownership"
+				return nil -- another server took over; never overwrite its data
+			end
+			result = "committed"
+			local stored: Stored = {
+				data = snapshot,
+				session = if release then nil else { jobId = game.JobId, token = profile.token, renewedAt = os.time() },
+			}
+			return stored, { player.UserId }
+		end)
+	end)
+	if not ok then
+		-- An errored write is UNKNOWN, not failed: the next autosave re-checks ownership and retries.
+		warn("[PlayerData] save error (will retry next autosave):", player.UserId, err)
+		return "unknown"
+	end
+	if result == "lost_ownership" then
+		warn("[PlayerData] lost session ownership for", player.UserId, "- this server will stop saving")
+		profile.active = false
+		player:Kick("Your data was opened on another server. Please rejoin.")
+	end
+	return result
+end
+
+function PlayerData.release(player: Player)
+	PlayerData.save(player, true)
+	profiles[player] = nil
+end
+
+function PlayerData.isMemoryOnly(): boolean
+	return memoryOnly
+end
+
+-- Autosave loop (also renews the session lease).
+task.spawn(function()
+	while true do
+		task.wait(AUTOSAVE_SECONDS)
+		for player in profiles do
+			task.spawn(PlayerData.save, player, false)
+		end
+	end
+end)
+
+game:BindToClose(function()
+	local pending = 0
+	for player in profiles do
+		pending += 1
+		task.spawn(function()
+			PlayerData.save(player, true)
+			pending -= 1
+		end)
+	end
+	local deadline = os.clock() + 25
+	while pending > 0 and os.clock() < deadline do
+		task.wait(0.1)
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	if profiles[player] then
+		PlayerData.release(player)
+	end
+end)
+
+return PlayerData
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="13">
+        <Properties>
+          <string name="Name">PlayerState</string>
+          <string name="Source"><![CDATA[--!strict
+-- Mirrors server-owned data onto Player attributes so the HUD can display it.
+-- Attributes are DISPLAY ONLY: the server never reads them back as truth.
+
+local Players = game:GetService("Players")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+local PlayerData = require(script.Parent.PlayerData)
+local Analytics = require(script.Parent.Analytics)
+
+local PlayerState = {}
+
+function PlayerState.sync(player: Player)
+	local data = PlayerData.get(player)
+	if not data then
+		return
+	end
+	player:SetAttribute("Coins", data.coins)
+	player:SetAttribute("Basket", data.basket)
+	player:SetAttribute("Capacity", Config.capacity(data.basketLevel))
+	player:SetAttribute("Golden", data.golden)
+	player:SetAttribute("BasketLevel", data.basketLevel)
+	player:SetAttribute("ShakeLevel", data.shakeLevel)
+	player:SetAttribute("TutorialStep", data.tutorialStep)
+	player:SetAttribute("Loaded", true)
+
+	local leaderstats = player:FindFirstChild("leaderstats")
+	if leaderstats then
+		local coins = leaderstats:FindFirstChild("Coins") :: IntValue?
+		if coins then
+			coins.Value = data.coins
+		end
+	end
+end
+
+-- Advance the tutorial/onboarding funnel. Steps only ever move forward, and each logs once.
+function PlayerState.reachStep(player: Player, step: number)
+	local data = PlayerData.get(player)
+	if not data or data.tutorialStep >= step then
+		return
+	end
+	for s = data.tutorialStep + 1, step do
+		Analytics.onboardingStep(player, s)
+	end
+	data.tutorialStep = step
+	player:SetAttribute("TutorialStep", step)
+end
+
+function PlayerState.createLeaderstats(player: Player)
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	local coins = Instance.new("IntValue")
+	coins.Name = "Coins"
+	coins.Parent = leaderstats
+	leaderstats.Parent = player
+end
+
+function PlayerState.init()
+	local function onPlayerAdded(player: Player)
+		PlayerState.createLeaderstats(player)
+		local data = PlayerData.load(player)
+		if not data then
+			player:Kick("Couldn't load your apples. Please rejoin in a minute!")
+			return
+		end
+		if player.Parent == nil then
+			return
+		end
+		PlayerState.sync(player)
+		PlayerState.reachStep(player, Config.TutorialSteps.Joined)
+	end
+	Players.PlayerAdded:Connect(onPlayerAdded)
+	-- players who joined before this script connected (common in Studio Play Solo)
+	for _, player in Players:GetPlayers() do
+		task.spawn(onPlayerAdded, player)
+	end
+end
+
+return PlayerState
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="14">
+        <Properties>
+          <string name="Name">RateLimiter</string>
+          <string name="Source"><![CDATA[--!strict
+-- Status: reviewed
+-- Last verified: 2026-07-16
+-- Test coverage: deterministic regression fixture in tests/RateLimiter.spec.lua
+-- Intended use: example; adapt configuration and enforcement policy before production.
+--[[
+RateLimiter.lua
+Per-player, per-action minimum-interval and token-bucket limiter.
+
+The minimum interval is a hard rejection: rejected attempts do not consume a
+bucket token or move the last-accepted timestamp. Dedicated instances must be
+destroyed when their owning system shuts down.
+]]
+
+local Players = game:GetService("Players")
+
+local DEFAULT_CAPACITY = 10
+local DEFAULT_REFILL_RATE = 1
+local DEFAULT_MIN_INTERVAL = 0.5
+local MAX_ACTIONS_PER_PLAYER = 64
+local MAX_ACTION_LENGTH = 100
+local MAX_ABUSE_SCORE = 10
+
+type Clock = () -> number
+
+type AbuseRecord = {
+	tokens: number,
+	lastRefill: number,
+	lastAccepted: number?,
+	abuseScore: number,
+}
+
+export type DenialReason = "min_interval" | "token_bucket" | "action_limit" | "destroyed"
+export type Config = {
+	capacity: number?,
+	refillRate: number?,
+	defaultMinInterval: number?,
+	maxActionsPerPlayer: number?,
+	clock: Clock?,
+}
+
+type RateLimiterState = {
+	records: { [number]: { [string]: AbuseRecord } },
+	_connection: RBXScriptConnection?,
+	_clock: Clock,
+	_capacity: number,
+	_refillRate: number,
+	_defaultMinInterval: number,
+	_maxActionsPerPlayer: number,
+	_destroyed: boolean,
+}
+
+local RateLimiter = {}
+RateLimiter.__index = RateLimiter
+
+export type RateLimiter = typeof(setmetatable({} :: RateLimiterState, RateLimiter))
+
+local function positiveNumber(value: number?, fallback: number, name: string): number
+	local resolved = if value == nil then fallback else value
+	if resolved ~= resolved or resolved == math.huge or resolved <= 0 then
+		error(`RateLimiter.new: {name} must be a positive number`, 3)
+	end
+	return resolved
+end
+
+function RateLimiter.new(config: Config?): RateLimiter
+	local options: Config = config or {}
+	local self = setmetatable(
+		{
+			records = {},
+			_connection = nil,
+			_clock = options.clock or os.clock,
+			_capacity = positiveNumber(options.capacity, DEFAULT_CAPACITY, "capacity"),
+			_refillRate = positiveNumber(options.refillRate, DEFAULT_REFILL_RATE, "refillRate"),
+			_defaultMinInterval = positiveNumber(
+				options.defaultMinInterval,
+				DEFAULT_MIN_INTERVAL,
+				"defaultMinInterval"
+			),
+			_maxActionsPerPlayer = math.floor(
+				positiveNumber(options.maxActionsPerPlayer, MAX_ACTIONS_PER_PLAYER, "maxActionsPerPlayer")
+			),
+			_destroyed = false,
+		} :: RateLimiterState,
+		RateLimiter
+	)
+	self._connection = Players.PlayerRemoving:Connect(function(player)
+		self:clearPlayer(player)
+	end)
+	return self
+end
+
+function RateLimiter:_canPerformUserId(userId: number, action: string, minInterval: number?): (boolean, DenialReason?)
+	if self._destroyed then
+		return false, "destroyed"
+	end
+	if userId ~= userId or userId == math.huge or userId == -math.huge or userId % 1 ~= 0 then
+		error("RateLimiter: userId must be a finite integer", 2)
+	end
+	if action == "" or #action > MAX_ACTION_LENGTH then
+		error(`RateLimiter: action must contain 1-{MAX_ACTION_LENGTH} bytes`, 2)
+	end
+
+	local interval = positiveNumber(minInterval, self._defaultMinInterval, "minInterval")
+	local playerRecords = self.records[userId]
+	if not playerRecords then
+		playerRecords = {}
+		self.records[userId] = playerRecords
+	end
+
+	local record = playerRecords[action]
+	if not record then
+		local actionCount = 0
+		for _ in playerRecords do
+			actionCount += 1
+		end
+		if actionCount >= self._maxActionsPerPlayer then
+			return false, "action_limit"
+		end
+
+		local now = self._clock()
+		record = {
+			tokens = self._capacity,
+			lastRefill = now,
+			lastAccepted = nil,
+			abuseScore = 0,
+		}
+		playerRecords[action] = record
+	end
+
+	local now = self._clock()
+	local elapsed = math.max(0, now - record.lastRefill)
+	record.tokens = math.min(self._capacity, record.tokens + elapsed * self._refillRate)
+	record.lastRefill = now
+
+	if record.lastAccepted ~= nil and now - record.lastAccepted < interval then
+		record.abuseScore = math.min(record.abuseScore + 0.25, MAX_ABUSE_SCORE)
+		return false, "min_interval"
+	end
+	if record.tokens < 1 then
+		record.abuseScore = math.min(record.abuseScore + 0.5, MAX_ABUSE_SCORE)
+		return false, "token_bucket"
+	end
+
+	record.tokens -= 1
+	record.lastAccepted = now
+	record.abuseScore = math.max(record.abuseScore - 0.1, 0)
+	return true, nil
+end
+
+function RateLimiter:canPerform(player: Player, action: string, minInterval: number?): (boolean, DenialReason?)
+	if typeof(player) ~= "Instance" or not player:IsA("Player") then
+		error("RateLimiter.canPerform: player must be a Player instance", 2)
+	end
+	if typeof(action) ~= "string" then
+		error("RateLimiter.canPerform: action must be a string", 2)
+	end
+	return self:_canPerformUserId(player.UserId, action, minInterval)
+end
+
+function RateLimiter:clearPlayer(player: Player)
+	if typeof(player) ~= "Instance" or not player:IsA("Player") then
+		error("RateLimiter.clearPlayer: player must be a Player instance", 2)
+	end
+	self.records[player.UserId] = nil
+end
+
+function RateLimiter.destroy(self: RateLimiter)
+	if self._destroyed then
+		return
+	end
+	self._destroyed = true
+	local connection = self._connection
+	if connection then
+		connection:Disconnect()
+		self._connection = nil
+	end
+	table.clear(self.records)
+end
+
+local default = RateLimiter.new()
+RateLimiter.default = default
+
+return RateLimiter
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="15">
+        <Properties>
+          <string name="Name">Trees</string>
+          <string name="Source"><![CDATA[--!strict
+-- Shake handling. Client says "I shook tree N"; server checks range, cooldown and basket,
+-- decides how many apples fall and where, then tells the shaker (and wobbles the tree for all).
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Remotes = require(Shared.Remotes)
+local PlayerData = require(script.Parent.PlayerData)
+local PlayerState = require(script.Parent.PlayerState)
+local Apples = require(script.Parent.Apples)
+local Analytics = require(script.Parent.Analytics)
+local RateLimiter = require(script.Parent.RateLimiter)
+
+local Trees = {}
+
+local treeBases: { [number]: Vector3 } = {}
+local shakeLimiter = RateLimiter.new({
+	capacity = 6,
+	refillRate = 1 / Config.Shake.cooldown,
+	defaultMinInterval = Config.Shake.cooldown * 0.8, -- small allowance for network jitter
+})
+local rng = Random.new()
+
+local function landingSpots(base: Vector3, count: number): { Vector3 }
+	local spots = {}
+	for i = 1, count do
+		local angle = (i / count) * math.pi * 2 + rng:NextNumber(-0.4, 0.4)
+		local radius = rng:NextNumber(Config.Apple.landMinRadius, Config.Apple.landMaxRadius)
+		spots[i] = base + Vector3.new(math.cos(angle) * radius, 0.6, math.sin(angle) * radius)
+	end
+	return spots
+end
+
+local function onShake(player: Player, treeId: any)
+	if type(treeId) ~= "number" or treeId % 1 ~= 0 then
+		return
+	end
+	local base = treeBases[treeId]
+	if not base then
+		return
+	end
+	local ok = shakeLimiter:canPerform(player, "shake")
+	if not ok then
+		return
+	end
+	local data = PlayerData.get(player)
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not data or not root then
+		return
+	end
+	local flat = Vector3.new(root.Position.X - base.X, 0, root.Position.Z - base.Z)
+	if flat.Magnitude > Config.Shake.range then
+		return
+	end
+	local capacity = Config.capacity(data.basketLevel)
+	if data.basket >= capacity then
+		Remotes.Notify:FireClient(player, "BasketFull", { capacity = capacity })
+		return
+	end
+
+	local firstShake = data.tutorialStep < Config.TutorialSteps.FirstShake
+	local count = Config.applesPerShake(data.shakeLevel)
+	local goldenIndex: number? = nil
+	if firstShake then
+		-- blueprint R2: a huge first payoff + a guaranteed golden apple ("moment of joy")
+		count *= Config.Tutorial.firstShakeMultiplier
+		goldenIndex = 1
+	elseif rng:NextNumber() < Config.Shake.goldenChance then
+		goldenIndex = rng:NextInteger(1, count)
+	end
+	count = math.min(count, 60)
+
+	data.totalShakes += 1
+	local infos = Apples.spawnPersonal(player, landingSpots(base, count), goldenIndex)
+	Remotes.ShakeResult:FireClient(player, treeId, infos, { firstShake = firstShake })
+	Remotes.TreeShaken:FireAllClients(treeId, player.UserId)
+	PlayerState.reachStep(player, Config.TutorialSteps.FirstShake)
+	if data.totalShakes % 50 == 0 then
+		Analytics.custom(player, "Shakes50", data.totalShakes)
+	end
+end
+
+function Trees.init(trees: { [number]: Model })
+	for id, model in trees do
+		local base = model:GetAttribute("Base")
+		if typeof(base) == "Vector3" then
+			treeBases[id] = base
+		end
+	end
+	Remotes.Shake.OnServerEvent:Connect(onShake)
+end
+
+return Trees
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="16">
+        <Properties>
+          <string name="Name">World</string>
+          <string name="Source"><![CDATA[--!strict
+-- Builds the prototype map in code: ground, starter orchard, sell stand, Apple Drop plaza.
+-- Primitive parts only so it works in a fresh place with no uploaded assets.
+-- Replace with real models later; keep the "AppleTree" tag + TreeId attribute contract.
+
+local CollectionService = game:GetService("CollectionService")
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+
+local World = {}
+
+local function part(props: { [string]: any }): Part
+	local p = Instance.new("Part")
+	p.Anchored = true
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	p.Material = Enum.Material.SmoothPlastic
+	-- Shape first (it can change Size), CFrame/Position last (table order is not guaranteed)
+	if props.Shape then
+		p.Shape = props.Shape
+	end
+	for key, value in props do
+		if key ~= "Shape" and key ~= "CFrame" and key ~= "Position" then
+			(p :: any)[key] = value
+		end
+	end
+	if props.CFrame then
+		p.CFrame = props.CFrame
+	elseif props.Position then
+		p.Position = props.Position
+	end
+	return p
+end
+
+local function label(parent: BasePart, text: string, offsetY: number, color: Color3, size: UDim2?)
+	local gui = Instance.new("BillboardGui")
+	gui.Name = "Label"
+	gui.Size = size or UDim2.fromScale(10, 2.5)
+	gui.StudsOffsetWorldSpace = Vector3.new(0, offsetY, 0)
+	gui.AlwaysOnTop = false
+	gui.MaxDistance = 140
+	gui.LightInfluence = 0
+	local t = Instance.new("TextLabel")
+	t.Name = "Text"
+	t.BackgroundTransparency = 1
+	t.Size = UDim2.fromScale(1, 1)
+	t.Font = Enum.Font.FredokaOne
+	t.TextScaled = true
+	t.TextColor3 = color
+	t.Text = text
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.Color = Config.Colors.uiStroke
+	stroke.Parent = t
+	t.Parent = gui
+	gui.Parent = parent
+	return gui
+end
+
+local function buildTree(id: number, base: Vector3, folder: Folder): Model
+	local model = Instance.new("Model")
+	model.Name = "AppleTree" .. id
+
+	local trunkHeight = 9
+	local trunk = part({
+		Name = "Trunk",
+		Shape = Enum.PartType.Cylinder,
+		Size = Vector3.new(trunkHeight, 2.6, 2.6),
+		CFrame = CFrame.new(base + Vector3.new(0, trunkHeight / 2, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = Config.Colors.trunk,
+		Material = Enum.Material.Wood,
+	})
+	trunk.Parent = model
+
+	-- canopy: a few overlapping leaf balls
+	local canopyCenter = base + Vector3.new(0, trunkHeight + 2.5, 0)
+	local offsets = {
+		Vector3.new(0, 0, 0),
+		Vector3.new(3, -1, 1),
+		Vector3.new(-3, -1, -1),
+		Vector3.new(1, 1.5, -3),
+		Vector3.new(-1, 1, 3),
+	}
+	for i, offset in offsets do
+		local ball = part({
+			Name = "Leaves" .. i,
+			Shape = Enum.PartType.Ball,
+			Size = Vector3.new(8, 8, 8) * (if i == 1 then 1.15 else 0.85),
+			Position = canopyCenter + offset,
+			Color = if i % 2 == 0 then Config.Colors.leafDark else Config.Colors.leaf,
+			Material = Enum.Material.Grass,
+			CanCollide = false,
+		})
+		ball.Parent = model
+	end
+
+	-- decorative apples hanging in the canopy (purely visual)
+	local rng = Random.new(id * 97)
+	for i = 1, 9 do
+		local dir = Vector3.new(rng:NextNumber(-1, 1), rng:NextNumber(-0.6, 0.4), rng:NextNumber(-1, 1)).Unit
+		local apple = part({
+			Name = "DecorApple" .. i,
+			Shape = Enum.PartType.Ball,
+			Size = Vector3.new(1.1, 1.1, 1.1),
+			Position = canopyCenter + dir * 4.6,
+			Color = Config.Colors.apple,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		apple.Parent = model
+	end
+
+	-- attachment the client uses as the "apples burst from here" point
+	local burst = Instance.new("Attachment")
+	burst.Name = "BurstPoint"
+	burst.WorldPosition = canopyCenter
+	burst.Parent = trunk
+
+	model.PrimaryPart = trunk
+	model:SetAttribute("TreeId", id)
+	model:SetAttribute("Base", base)
+	CollectionService:AddTag(model, "AppleTree")
+	model.Parent = folder
+	return model
+end
+
+function World.build(): { trees: { [number]: Model }, sellPad: BasePart }
+	local map = Instance.new("Folder")
+	map.Name = "Map"
+	map.Parent = Workspace
+
+	-- remove the default baseplate if the place has one
+	local oldBaseplate = Workspace:FindFirstChild("Baseplate")
+	if oldBaseplate then
+		oldBaseplate:Destroy()
+	end
+
+	local ground = part({
+		Name = "Ground",
+		Size = Vector3.new(400, 4, 400),
+		Position = Vector3.new(0, -2, 20),
+		Color = Config.Colors.grass,
+		Material = Enum.Material.Grass,
+	})
+	ground.Parent = map
+
+	-- spawn: faces the orchard so the first thing you see is a tree (blueprint R1)
+	local spawn = Instance.new("SpawnLocation")
+	spawn.Name = "Spawn"
+	spawn.Anchored = true
+	spawn.Size = Vector3.new(8, 1, 8)
+	spawn.CFrame =
+		CFrame.lookAt(Config.World.spawn + Vector3.new(0, 0.5, 0), Config.World.spawn + Vector3.new(0, 0.5, 10))
+	spawn.Color = Color3.fromRGB(255, 220, 120)
+	spawn.Material = Enum.Material.SmoothPlastic
+	spawn.Duration = 0
+	spawn.Neutral = true
+	spawn.Parent = map
+
+	-- orchard
+	local treeFolder = Instance.new("Folder")
+	treeFolder.Name = "Trees"
+	treeFolder.Parent = map
+	local trees = {}
+	for i, pos in Config.World.trees do
+		trees[i] = buildTree(i, pos, treeFolder)
+	end
+
+	-- sell stand: a glowing pad + a little hut sign
+	local sellPad = part({
+		Name = "SellPad",
+		Size = Vector3.new(12, 0.6, 12),
+		Position = Config.World.sellPad + Vector3.new(0, 0.3, 0),
+		Color = Config.Colors.coin,
+		Material = Enum.Material.Neon,
+		Transparency = 0.15,
+	})
+	sellPad.Parent = map
+	local sign = part({
+		Name = "SellSign",
+		Size = Vector3.new(12, 6, 1),
+		Position = Config.World.sellPad + Vector3.new(0, 7, -6.5),
+		Color = Color3.fromRGB(150, 100, 60),
+		Material = Enum.Material.WoodPlanks,
+	})
+	sign.Parent = map
+	label(sign, "SELL APPLES", 4.5, Config.Colors.coin, UDim2.fromScale(14, 3))
+	for _, x in { -5.5, 5.5 } do
+		part({
+			Name = "Post",
+			Size = Vector3.new(1, 10, 1),
+			Position = Config.World.sellPad + Vector3.new(x, 5, -6.5),
+			Color = Config.Colors.trunk,
+			Material = Enum.Material.Wood,
+		}).Parent =
+			map
+	end
+
+	-- Apple Drop plaza: a ring the rain falls into + a countdown billboard
+	local plaza = part({
+		Name = "DropPlaza",
+		Shape = Enum.PartType.Cylinder,
+		Size = Vector3.new(0.4, Config.Drop.plazaRadius * 2, Config.Drop.plazaRadius * 2),
+		CFrame = CFrame.new(Config.Drop.plazaCenter + Vector3.new(0, 0.2, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = Color3.fromRGB(240, 200, 120),
+		Material = Enum.Material.Sand,
+	})
+	plaza.Parent = map
+	local tower = part({
+		Name = "DropTower",
+		Size = Vector3.new(3, 14, 3),
+		Position = Config.Drop.plazaCenter + Vector3.new(0, 7, 0),
+		Color = Color3.fromRGB(200, 60, 50),
+		Material = Enum.Material.SmoothPlastic,
+	})
+	tower.Parent = map
+	local countdown = label(tower, "APPLE DROP", 11, Config.Colors.golden, UDim2.fromScale(16, 4))
+	countdown.Name = "DropCountdown"
+	countdown.MaxDistance = 400
+
+	-- bright, friendly lighting
+	Lighting.ClockTime = 14
+	Lighting.Brightness = 2.5
+	Lighting.OutdoorAmbient = Color3.fromRGB(150, 150, 150)
+	Lighting.GlobalShadows = true
+	if not Lighting:FindFirstChildOfClass("Atmosphere") then
+		local atmosphere = Instance.new("Atmosphere")
+		atmosphere.Density = 0.25
+		atmosphere.Haze = 1
+		atmosphere.Color = Color3.fromRGB(200, 230, 255)
+		atmosphere.Parent = Lighting
+	end
+
+	return { trees = trees, sellPad = sellPad }
+end
+
+return World
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="17">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="18">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="Folder" referent="19">
+        <Properties>
+          <string name="Name">Client</string>
+        </Properties>
+        <Item class="ModuleScript" referent="20">
+          <Properties>
+            <string name="Name">AppleVisuals</string>
+            <string name="Source"><![CDATA[--!strict
+-- Client-side apple rendering + magnet pickup.
+-- The server already decided every apple's id and landing spot; we animate them,
+-- ask to collect nearby ones, and only "pop" them once the server confirms.
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Remotes = require(Shared.Remotes)
+local Juice = require(script.Parent.Juice)
+local Sounds = require(script.Parent.Sounds)
+
+export type AppleInfo = { id: number, position: Vector3, golden: boolean }
+
+type Visual = {
+	id: number,
+	part: Part,
+	golden: boolean,
+	shared: boolean,
+	from: Vector3,
+	to: Vector3,
+	spawnedAt: number,
+	delay: number,
+	flight: number,
+	arc: number,
+	landed: boolean,
+	pendingSince: number?, -- collect requested, waiting for server
+	expiresAt: number,
+}
+
+local AppleVisuals = {}
+
+local player = Players.LocalPlayer
+local folder = Instance.new("Folder")
+folder.Name = "ClientApples"
+folder.Parent = Workspace
+
+local visuals: { [number]: Visual } = {}
+local pool: { Part } = {}
+local basketFull = false
+local outgoing: { number } = {}
+local lastSend = 0
+local comboCount = 0
+local comboAt = 0
+
+AppleVisuals.onGolden = nil :: ((position: Vector3) -> ())?
+
+local function makePart(): Part
+	local p = table.remove(pool)
+	if p then
+		return p
+	end
+	p = Instance.new("Part")
+	p.Shape = Enum.PartType.Ball
+	p.Size = Vector3.new(1.4, 1.4, 1.4)
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.Material = Enum.Material.SmoothPlastic
+	local stem = Instance.new("Part")
+	stem.Name = "Stem"
+	stem.Size = Vector3.new(0.15, 0.45, 0.15)
+	stem.Color = Config.Colors.trunk
+	stem.Anchored = true
+	stem.CanCollide = false
+	stem.CanQuery = false
+	stem.CanTouch = false
+	stem.Parent = p
+	return p
+end
+
+local function release(v: Visual)
+	visuals[v.id] = nil
+	local p = v.part
+	local glow = p:FindFirstChild("Glow")
+	if glow then
+		glow:Destroy()
+	end
+	local sparkle = p:FindFirstChild("Sparkle")
+	if sparkle then
+		sparkle:Destroy()
+	end
+	p.Parent = nil
+	if #pool < 150 then
+		table.insert(pool, p)
+	else
+		p:Destroy()
+	end
+end
+
+local function spawnVisual(
+	info: AppleInfo,
+	from: Vector3,
+	delay: number,
+	isShared: boolean,
+	flight: number,
+	arc: number
+)
+	if visuals[info.id] then
+		return
+	end
+	local p = makePart()
+	p.Color = if info.golden then Config.Colors.golden else Config.Colors.apple
+	p.Material = if info.golden then Enum.Material.Neon else Enum.Material.SmoothPlastic
+	p.Transparency = 0
+	p.Position = from
+	if info.golden then
+		local light = Instance.new("PointLight")
+		light.Name = "Glow"
+		light.Color = Config.Colors.golden
+		light.Range = 10
+		light.Brightness = 2
+		light.Parent = p
+		local e = Instance.new("ParticleEmitter")
+		e.Name = "Sparkle"
+		e.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+		e.Color = ColorSequence.new(Config.Colors.golden)
+		e.LightEmission = 1
+		e.Size = NumberSequence.new(0.5, 0)
+		e.Lifetime = NumberRange.new(0.5, 0.9)
+		e.Rate = 12
+		e.Speed = NumberRange.new(1, 3)
+		e.SpreadAngle = Vector2.new(180, 180)
+		e.Parent = p
+	end
+	p.Parent = folder
+	visuals[info.id] = {
+		id = info.id,
+		part = p,
+		golden = info.golden,
+		shared = isShared,
+		from = from,
+		to = info.position,
+		spawnedAt = os.clock(),
+		delay = delay,
+		flight = flight,
+		arc = arc,
+		landed = false,
+		pendingSince = nil,
+		expiresAt = os.clock() + Config.Apple.lifetime - 0.5,
+	}
+end
+
+-- Apples bursting out of a tree you shook.
+function AppleVisuals.burst(apples: { AppleInfo }, from: Vector3)
+	for i, info in apples do
+		spawnVisual(info, from, (i - 1) * 0.025, false, 0.55, 6)
+	end
+end
+
+-- Apple Rain: apples fall from the sky.
+function AppleVisuals.rain(apples: { AppleInfo })
+	for _, info in apples do
+		spawnVisual(info, info.position + Vector3.new(0, 60, 0), 0, true, 1.1, 0)
+	end
+end
+
+function AppleVisuals.removeShared(ids: { number })
+	for _, id in ids do
+		local v = visuals[id]
+		if v and not v.pendingSince then
+			release(v)
+		end
+	end
+end
+
+function AppleVisuals.setBasketFull(full: boolean)
+	basketFull = full
+end
+
+local function popCombo(): number
+	local now = os.clock()
+	if now - comboAt > 1.2 then
+		comboCount = 0
+	end
+	comboAt = now
+	comboCount += 1
+	return math.min(1 + comboCount * 0.04, 2)
+end
+
+function AppleVisuals.onCollectResult(collectedIds: { number }, _goldenGained: number, reason: string?)
+	for _, id in collectedIds do
+		local v = visuals[id]
+		if v then
+			local pos = v.part.Position
+			if v.golden then
+				Sounds.play("golden", 1.5, 0.8)
+				Juice.popNumber(pos, 1, "golden")
+				Juice.sparkle(pos, Config.Colors.golden, 30)
+				if AppleVisuals.onGolden then
+					AppleVisuals.onGolden(pos)
+				end
+			else
+				Sounds.play("pop", popCombo(), 0.35)
+				Juice.popNumber(pos, 1, "apple")
+			end
+			release(v)
+		end
+	end
+	if reason == "full" then
+		basketFull = true
+	end
+end
+
+local function root(): BasePart?
+	local character = player.Character
+	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+end
+
+RunService.RenderStepped:Connect(function()
+	local now = os.clock()
+	local r = root()
+	local rootPos = r and r.Position
+	for _, v in visuals do
+		local t = now - v.spawnedAt - v.delay
+		if now > v.expiresAt and not v.pendingSince then
+			release(v)
+			continue
+		end
+		if t < 0 then
+			continue
+		end
+		if v.pendingSince and rootPos then
+			-- fly toward the player while the server confirms
+			local alpha = math.clamp((now - v.pendingSince) / 0.18, 0, 1)
+			v.part.Position = v.part.Position:Lerp(rootPos, alpha * 0.5)
+			if now - v.pendingSince > 1.5 then
+				-- server said no (or packet lost): put it back on the ground
+				v.pendingSince = nil
+				v.part.Position = v.to
+			end
+		elseif not v.landed then
+			local a = math.clamp(t / v.flight, 0, 1)
+			local pos = v.from:Lerp(v.to, a)
+			if v.arc > 0 then
+				pos += Vector3.new(0, v.arc * 4 * a * (1 - a), 0)
+			else
+				-- rain: ease-in fall
+				pos = v.from:Lerp(v.to, a * a)
+			end
+			v.part.Position = pos
+			if a >= 1 then
+				v.landed = true
+			end
+		else
+			-- idle bob + spin so apples on the ground read as "pick me up"
+			local bob = math.sin((now + v.id) * 4) * 0.15
+			v.part.CFrame = CFrame.new(v.to + Vector3.new(0, bob, 0)) * CFrame.Angles(0, now * 2 + v.id, 0)
+		end
+		local stem = v.part:FindFirstChild("Stem") :: BasePart?
+		if stem then
+			stem.CFrame = v.part.CFrame * CFrame.new(0, 0.85, 0)
+		end
+
+		-- magnet: queue landed apples near us for a collect request
+		if rootPos and v.landed and not v.pendingSince then
+			local wantsIt = v.golden or not basketFull
+			if wantsIt and (v.to - rootPos).Magnitude <= Config.Apple.magnetRadius then
+				v.pendingSince = now
+				table.insert(outgoing, v.id)
+			end
+		end
+	end
+
+	if #outgoing > 0 and now - lastSend > 0.08 then
+		lastSend = now
+		local batch = {}
+		for i = 1, math.min(#outgoing, Config.Apple.maxPerCollectRequest) do
+			batch[i] = outgoing[i]
+		end
+		for _ = 1, #batch do
+			table.remove(outgoing, 1)
+		end
+		Remotes.Collect:FireServer(batch)
+	end
+end)
+
+return AppleVisuals
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="21">
+          <Properties>
+            <string name="Name">Guide</string>
+            <string name="Source"><![CDATA[--!strict
+-- Teach-by-doing guide (blueprint R1/R3): a glowing beam from your feet to the next target
+-- plus a bouncing arrow over it. No text walls.
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+
+local Guide = {}
+
+local player = Players.LocalPlayer
+
+local anchor = Instance.new("Part")
+anchor.Name = "GuideTarget"
+anchor.Anchored = true
+anchor.CanCollide = false
+anchor.CanQuery = false
+anchor.CanTouch = false
+anchor.Transparency = 1
+anchor.Size = Vector3.new(0.2, 0.2, 0.2)
+anchor.Parent = Workspace
+
+local targetAttachment = Instance.new("Attachment")
+targetAttachment.Parent = anchor
+
+local beam = Instance.new("Beam")
+beam.Attachment1 = targetAttachment
+beam.Color = ColorSequence.new(Config.Colors.golden)
+beam.LightEmission = 1
+beam.LightInfluence = 0
+beam.Width0 = 0.9
+beam.Width1 = 0.9
+beam.FaceCamera = true
+beam.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+beam.TextureMode = Enum.TextureMode.Static
+beam.TextureLength = 2
+beam.TextureSpeed = 2
+beam.Transparency = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0.6),
+	NumberSequenceKeypoint.new(0.5, 0.2),
+	NumberSequenceKeypoint.new(1, 0.1),
+})
+beam.Enabled = false
+beam.Parent = anchor
+
+local arrow = Instance.new("BillboardGui")
+arrow.Name = "GuideArrow"
+arrow.Size = UDim2.fromOffset(90, 90)
+arrow.AlwaysOnTop = true
+arrow.LightInfluence = 0
+arrow.Adornee = anchor
+arrow.Enabled = false
+local arrowLabel = Instance.new("TextLabel")
+arrowLabel.BackgroundTransparency = 1
+arrowLabel.Size = UDim2.fromScale(1, 1)
+arrowLabel.Font = Enum.Font.FredokaOne
+arrowLabel.TextScaled = true
+arrowLabel.Text = "⬇"
+arrowLabel.TextColor3 = Config.Colors.golden
+local arrowStroke = Instance.new("UIStroke")
+arrowStroke.Thickness = 4
+arrowStroke.Color = Config.Colors.uiStroke
+arrowStroke.Parent = arrowLabel
+arrowLabel.Parent = arrow
+arrow.Parent = player:WaitForChild("PlayerGui")
+
+local target: Vector3? = nil
+local arrowHeight = 6
+
+-- Point the guide at a world position (nil hides it).
+function Guide.setTarget(position: Vector3?, height: number?)
+	target = position
+	arrowHeight = height or 6
+	if position then
+		anchor.Position = position + Vector3.new(0, 0.5, 0)
+	end
+end
+
+RunService.RenderStepped:Connect(function()
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+	local show = target ~= nil and root ~= nil
+	if show and root then
+		local rootAttachment = root:FindFirstChild("GuideAttachment") :: Attachment?
+		if not rootAttachment then
+			local a = Instance.new("Attachment")
+			a.Name = "GuideAttachment"
+			a.Position = Vector3.new(0, -2.5, 0)
+			a.Parent = root
+			rootAttachment = a
+		end
+		beam.Attachment0 = rootAttachment
+		-- hide the beam once you're basically there; keep the arrow
+		beam.Enabled = (root.Position - (target :: Vector3)).Magnitude > 10
+		arrow.StudsOffsetWorldSpace = Vector3.new(0, arrowHeight + math.sin(os.clock() * 5) * 0.8, 0)
+		arrow.Enabled = true
+	else
+		beam.Enabled = false
+		arrow.Enabled = false
+	end
+end)
+
+return Guide
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="22">
+          <Properties>
+            <string name="Name">Hud</string>
+            <string name="Source"><![CDATA[--!strict
+-- Mobile-first HUD (blueprint U1-U8). Built in code with Scale sizing + size constraints.
+-- Layout:
+--   top-left   : basket bar, coins (+ opens shop), golden apples
+--   top-center : APPLE DROP countdown (the hero element)
+--   right      : goal tracker
+--   left edge  : SHOP button
+--   bottom     : big SHAKE button (above the jump button on touch screens)
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local Shared = game:GetService("ReplicatedStorage").Shared
+local Config = require(Shared.Config)
+local Format = require(Shared.Format)
+local Sounds = require(script.Parent.Sounds)
+
+local Hud = {}
+
+local player = Players.LocalPlayer
+local C = Config.Colors
+local FONT = Enum.Font.FredokaOne
+
+---------------------------------------------------------------------------
+-- tiny UI helpers
+---------------------------------------------------------------------------
+local function new(className: string, props: { [string]: any }, children: { Instance }?): any
+	local inst = Instance.new(className)
+	for key, value in props do
+		if key ~= "Parent" then
+			(inst :: any)[key] = value
+		end
+	end
+	if children then
+		for _, child in children do
+			child.Parent = inst
+		end
+	end
+	if props.Parent then
+		inst.Parent = props.Parent
+	end
+	return inst
+end
+
+local function corner(radius: number?): UICorner
+	return new("UICorner", { CornerRadius = UDim.new(radius or 0.25, 0) })
+end
+
+local function stroke(thickness: number?, color: Color3?): UIStroke
+	return new("UIStroke", {
+		Thickness = thickness or 3,
+		Color = color or C.uiStroke,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+end
+
+local function textStroke(): UIStroke
+	return new("UIStroke", { Thickness = 2.5, Color = C.uiStroke })
+end
+
+local function label(props: { [string]: any }): TextLabel
+	local defaults = {
+		BackgroundTransparency = 1,
+		Font = FONT,
+		TextScaled = true,
+		TextColor3 = C.white,
+	}
+	for k, v in props do
+		defaults[k] = v
+	end
+	return new("TextLabel", defaults, { textStroke() })
+end
+
+-- Every button squishes on press and plays a click (blueprint U3).
+local function juicyButton(button: GuiButton, onActivated: () -> ())
+	local scale = button:FindFirstChildOfClass("UIScale") or new("UIScale", { Parent = button })
+	button.MouseEnter:Connect(function()
+		TweenService:Create(scale, TweenInfo.new(0.12), { Scale = 1.06 }):Play()
+	end)
+	button.MouseLeave:Connect(function()
+		TweenService:Create(scale, TweenInfo.new(0.12), { Scale = 1 }):Play()
+	end)
+	button.Activated:Connect(function()
+		scale.Scale = 0.88
+		TweenService:Create(scale, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			Scale = 1,
+		}):Play()
+		Sounds.play("click", 1.1, 0.4)
+		onActivated()
+	end)
+end
+
+local function bounce(gui: GuiObject, amount: number?)
+	local scale = gui:FindFirstChildOfClass("UIScale") or new("UIScale", { Parent = gui })
+	scale.Scale = 1 + (amount or 0.12)
+	TweenService:Create(scale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Scale = 1,
+	}):Play()
+end
+
+-- Counting number display (blueprint U8: count up instead of jumping).
+local function countingText(textLabel: TextLabel, prefix: string, suffix: (() -> string)?)
+	local value = new("NumberValue", { Parent = textLabel })
+	value.Changed:Connect(function(v)
+		textLabel.Text = prefix .. Format.short(v) .. (if suffix then suffix() else "")
+	end)
+	return function(target: number)
+		TweenService:Create(value, TweenInfo.new(0.35, Enum.EasingStyle.Quad), { Value = target }):Play()
+	end
+end
+
+---------------------------------------------------------------------------
+-- build
+---------------------------------------------------------------------------
+local gui: ScreenGui
+local refs: { [string]: any } = {}
+local callbacks = {
+	onShake = function() end,
+	onBuy = function(_kind: string) end,
+}
+
+function Hud.build(handlers: { onShake: () -> (), onBuy: (kind: string) -> () })
+	callbacks = handlers
+	gui = new("ScreenGui", {
+		Name = "AppleApeHud",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets,
+		Parent = player:WaitForChild("PlayerGui"),
+	})
+
+	-- full-screen flash for big moments (sits on top)
+	refs.flash = new("Frame", {
+		Name = "Flash",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundColor3 = C.white,
+		BackgroundTransparency = 1,
+		ZIndex = 50,
+		Parent = gui,
+	})
+
+	-- top-left stat stack --------------------------------------------------
+	local stats = new("Frame", {
+		Name = "Stats",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0.012, 0.02),
+		Size = UDim2.fromScale(0.3, 0.27),
+		Parent = gui,
+	}, {
+		new("UISizeConstraint", { MinSize = Vector2.new(190, 120), MaxSize = Vector2.new(340, 200) }),
+		new("UIListLayout", { Padding = UDim.new(0.05, 0), SortOrder = Enum.SortOrder.LayoutOrder }),
+	})
+
+	local function statRow(name: string, order: number, icon: string, color: Color3): Frame
+		return new("Frame", {
+			Name = name,
+			LayoutOrder = order,
+			Size = UDim2.fromScale(1, 0.3),
+			BackgroundColor3 = C.ui,
+			BackgroundTransparency = 0.15,
+			Parent = stats,
+		}, {
+			corner(0.4),
+			stroke(3),
+			label({
+				Name = "Icon",
+				Text = icon,
+				Size = UDim2.fromScale(0.2, 0.9),
+				Position = UDim2.fromScale(0.02, 0.05),
+				TextColor3 = color,
+			}),
+		})
+	end
+
+	-- basket bar
+	local basketRow = statRow("Basket", 1, "🍎", C.apple)
+	refs.basketRow = basketRow
+	local track = new("Frame", {
+		Name = "Track",
+		Position = UDim2.fromScale(0.22, 0.2),
+		Size = UDim2.fromScale(0.74, 0.6),
+		BackgroundColor3 = Color3.fromRGB(60, 20, 20),
+		Parent = basketRow,
+	}, { corner(0.5) })
+	refs.basketFill = new("Frame", {
+		Name = "Fill",
+		Size = UDim2.fromScale(0, 1),
+		BackgroundColor3 = C.apple,
+		Parent = track,
+	}, {
+		corner(0.5),
+		new("UIGradient", {
+			Color = ColorSequence.new(Color3.fromRGB(255, 120, 110), C.apple),
+			Rotation = 90,
+		}),
+	})
+	refs.basketText = label({
+		Name = "Amount",
+		Text = "0 / 25",
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = 3,
+		Parent = track,
+	})
+
+	-- coins
+	local coinRow = statRow("Coins", 2, "🪙", C.coin)
+	refs.coinRow = coinRow
+	refs.coinText = label({
+		Name = "Amount",
+		Text = "0",
+		Size = UDim2.fromScale(0.55, 0.8),
+		Position = UDim2.fromScale(0.22, 0.1),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = C.coin,
+		Parent = coinRow,
+	})
+	local plus = new("TextButton", {
+		Name = "Plus",
+		Text = "+",
+		Font = FONT,
+		TextScaled = true,
+		TextColor3 = C.white,
+		BackgroundColor3 = C.good,
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.fromScale(0.97, 0.5),
+		Size = UDim2.fromScale(0.18, 0.8),
+		Parent = coinRow,
+	}, { corner(0.35), stroke(2.5), textStroke() })
+	juicyButton(plus, function()
+		Hud.toggleShop(true)
+	end)
+	refs.setCoins = countingText(refs.coinText, "")
+
+	-- golden apples
+	local goldRow = statRow("Golden", 3, "✨", C.golden)
+	refs.goldRow = goldRow
+	refs.goldText = label({
+		Name = "Amount",
+		Text = "0",
+		Size = UDim2.fromScale(0.7, 0.8),
+		Position = UDim2.fromScale(0.22, 0.1),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = C.golden,
+		Parent = goldRow,
+	})
+	refs.setGolden = countingText(refs.goldText, "", function()
+		return " Golden"
+	end)
+
+	-- top-center Apple Drop countdown -------------------------------------
+	refs.dropPill = new("Frame", {
+		Name = "DropPill",
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.fromScale(0.5, 0.015),
+		Size = UDim2.fromScale(0.3, 0.075),
+		BackgroundColor3 = Color3.fromRGB(190, 45, 45),
+		Parent = gui,
+	}, {
+		corner(0.5),
+		stroke(3),
+		new("UISizeConstraint", { MinSize = Vector2.new(210, 40), MaxSize = Vector2.new(420, 64) }),
+		new(
+			"UIGradient",
+			{ Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200)), Rotation = 90 }
+		),
+	})
+	refs.dropText = label({
+		Name = "Text",
+		Text = "🍎 APPLE DROP IN 0:00",
+		Size = UDim2.fromScale(0.92, 0.75),
+		Position = UDim2.fromScale(0.04, 0.12),
+		Parent = refs.dropPill,
+	})
+
+	-- right goal tracker ---------------------------------------------------
+	refs.goal = new("Frame", {
+		Name = "Goal",
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.fromScale(0.985, 0.2),
+		Size = UDim2.fromScale(0.25, 0.12),
+		BackgroundColor3 = C.ui,
+		BackgroundTransparency = 0.15,
+		Parent = gui,
+	}, {
+		corner(0.2),
+		stroke(3),
+		new("UISizeConstraint", { MinSize = Vector2.new(170, 60), MaxSize = Vector2.new(320, 96) }),
+		label({
+			Name = "Title",
+			Text = "GOAL",
+			Size = UDim2.fromScale(0.9, 0.3),
+			Position = UDim2.fromScale(0.05, 0.05),
+			TextColor3 = C.golden,
+			TextXAlignment = Enum.TextXAlignment.Left,
+		}),
+	})
+	refs.goalText = label({
+		Name = "Text",
+		Text = "Shake a tree!",
+		Size = UDim2.fromScale(0.9, 0.55),
+		Position = UDim2.fromScale(0.05, 0.38),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = refs.goal,
+	})
+
+	-- left-edge SHOP button -------------------------------------------------
+	local shopButton = new("TextButton", {
+		Name = "ShopButton",
+		Text = "🛒 SHOP",
+		Font = FONT,
+		TextScaled = true,
+		TextColor3 = C.white,
+		BackgroundColor3 = Color3.fromRGB(60, 140, 230),
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.fromScale(0.012, 0.5),
+		Size = UDim2.fromScale(0.13, 0.08),
+		Parent = gui,
+	}, {
+		corner(0.35),
+		stroke(3),
+		textStroke(),
+		new("UISizeConstraint", { MinSize = Vector2.new(100, 44), MaxSize = Vector2.new(170, 64) }),
+	})
+	refs.shopButton = shopButton
+	juicyButton(shopButton, function()
+		Hud.toggleShop()
+	end)
+
+	-- SHAKE button -----------------------------------------------------------
+	local touch = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+	local shake = new("TextButton", {
+		Name = "ShakeButton",
+		Text = if touch then "SHAKE!" else "SHAKE! [E]",
+		Font = FONT,
+		TextScaled = true,
+		TextColor3 = C.white,
+		BackgroundColor3 = C.good,
+		AnchorPoint = if touch then Vector2.new(1, 1) else Vector2.new(0.5, 1),
+		-- touch: sit above the jump button; desktop: bottom center
+		Position = if touch then UDim2.new(1, -25, 1, -175) else UDim2.fromScale(0.5, 0.96),
+		Size = if touch then UDim2.fromOffset(120, 120) else UDim2.fromScale(0.2, 0.1),
+		Visible = false,
+		Parent = gui,
+	}, {
+		corner(if touch then 1 else 0.4),
+		stroke(4),
+		textStroke(),
+		new("UIPadding", {
+			PaddingLeft = UDim.new(0.1, 0),
+			PaddingRight = UDim.new(0.1, 0),
+			PaddingTop = UDim.new(0.15, 0),
+			PaddingBottom = UDim.new(0.15, 0),
+		}),
+		new("UISizeConstraint", { MinSize = Vector2.new(110, 56), MaxSize = Vector2.new(260, 120) }),
+	})
+	refs.shakeButton = shake
+	juicyButton(shake, function()
+		callbacks.onShake()
+	end)
+
+	-- banner (big center messages) + toast (small) ----------------------------
+	refs.banner = label({
+		Name = "Banner",
+		Text = "",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.3),
+		Size = UDim2.fromScale(0.6, 0.1),
+		Visible = false,
+		ZIndex = 20,
+		Parent = gui,
+	})
+	refs.toast = label({
+		Name = "Toast",
+		Text = "",
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.fromScale(0.5, 0.82),
+		Size = UDim2.fromScale(0.5, 0.05),
+		Visible = false,
+		ZIndex = 20,
+		Parent = gui,
+	})
+
+	Hud.buildShop()
+end
+
+---------------------------------------------------------------------------
+-- shop panel (coin upgrades for now; Robux products come in Phase B)
+---------------------------------------------------------------------------
+local UPGRADES = {
+	{ kind = "Basket", title = "Bigger Basket", icon = "🧺", attr = "BasketLevel" },
+	{ kind = "Shake", title = "Stronger Shake", icon = "💪", attr = "ShakeLevel" },
+}
+
+function Hud.buildShop()
+	local panel = new("Frame", {
+		Name = "Shop",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.52),
+		Size = UDim2.fromScale(0.5, 0.55),
+		BackgroundColor3 = C.ui,
+		Visible = false,
+		ZIndex = 10,
+		Parent = gui,
+	}, {
+		corner(0.06),
+		stroke(4),
+		new("UISizeConstraint", { MinSize = Vector2.new(300, 230), MaxSize = Vector2.new(560, 380) }),
+		label({
+			Name = "Title",
+			Text = "🛒 SHOP",
+			Size = UDim2.fromScale(0.6, 0.14),
+			Position = UDim2.fromScale(0.2, 0.03),
+			TextColor3 = C.golden,
+			ZIndex = 11,
+		}),
+	})
+	refs.shop = panel
+	local close = new("TextButton", {
+		Name = "Close",
+		Text = "X",
+		Font = FONT,
+		TextScaled = true,
+		TextColor3 = C.white,
+		BackgroundColor3 = C.bad,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.fromScale(0.97, 0.03),
+		Size = UDim2.fromScale(0.1, 0.14),
+		ZIndex = 11,
+		Parent = panel,
+	}, { corner(0.3), stroke(2.5), textStroke(), new("UIAspectRatioConstraint", { AspectRatio = 1 }) })
+	juicyButton(close, function()
+		Hud.toggleShop(false)
+	end)
+
+	refs.cards = {}
+	for i, def in UPGRADES do
+		local card = new("Frame", {
+			Name = def.kind,
+			Position = UDim2.fromScale(0.04 + (i - 1) * 0.48, 0.22),
+			Size = UDim2.fromScale(0.44, 0.72),
+			BackgroundColor3 = Color3.fromRGB(45, 52, 75),
+			ZIndex = 11,
+			Parent = panel,
+		}, {
+			corner(0.1),
+			stroke(3),
+			label({
+				Name = "Icon",
+				Text = def.icon,
+				Size = UDim2.fromScale(1, 0.22),
+				Position = UDim2.fromScale(0, 0.03),
+				ZIndex = 12,
+			}),
+			label({
+				Name = "Title",
+				Text = def.title,
+				Size = UDim2.fromScale(0.9, 0.14),
+				Position = UDim2.fromScale(0.05, 0.26),
+				ZIndex = 12,
+			}),
+		})
+		local info = label({
+			Name = "Info",
+			Text = "",
+			Size = UDim2.fromScale(0.9, 0.2),
+			Position = UDim2.fromScale(0.05, 0.42),
+			TextColor3 = Color3.fromRGB(200, 220, 255),
+			ZIndex = 12,
+			Parent = card,
+		})
+		local buy = new("TextButton", {
+			Name = "Buy",
+			Text = "",
+			Font = FONT,
+			TextScaled = true,
+			TextColor3 = C.white,
+			BackgroundColor3 = C.good,
+			Position = UDim2.fromScale(0.08, 0.7),
+			Size = UDim2.fromScale(0.84, 0.22),
+			ZIndex = 12,
+			Parent = card,
+		}, { corner(0.35), stroke(3), textStroke() })
+		juicyButton(buy, function()
+			callbacks.onBuy(def.kind)
+		end)
+		refs.cards[def.kind] = { info = info, buy = buy, def = def }
+	end
+end
+
+function Hud.refreshShop()
+	if not refs.cards then
+		return
+	end
+	local coins = (player:GetAttribute("Coins") :: number?) or 0
+	for kind, card in refs.cards do
+		local level = (player:GetAttribute(card.def.attr) :: number?) or 1
+		local maxed = level >= Config.maxLevel(kind)
+		local cost = Config.upgradeCost(kind, level)
+		if kind == "Basket" then
+			card.info.Text = `Lv.{level}: holds {Config.capacity(level)}`
+				.. (if maxed then "" else ` → {Config.capacity(level + 1)}`)
+		else
+			card.info.Text = `Lv.{level}: {Config.applesPerShake(level)} apples`
+				.. (if maxed then "" else ` → {Config.applesPerShake(level + 1)}`)
+		end
+		card.buy.Text = if maxed then "MAX" else `🪙 {Format.short(cost)}`
+		card.buy.BackgroundColor3 = if maxed
+			then Color3.fromRGB(110, 110, 110)
+			elseif coins >= cost then C.good
+			else Color3.fromRGB(150, 70, 70)
+	end
+end
+
+function Hud.toggleShop(force: boolean?)
+	local panel = refs.shop :: Frame
+	local show = if force ~= nil then force else not panel.Visible
+	if show then
+		Hud.refreshShop()
+		panel.Visible = true
+		bounce(panel, 0.15)
+	else
+		panel.Visible = false
+	end
+end
+
+function Hud.isShopOpen(): boolean
+	return refs.shop and refs.shop.Visible
+end
+
+---------------------------------------------------------------------------
+-- updates called by the controller
+---------------------------------------------------------------------------
+local lastBasket = 0
+
+function Hud.setBasket(amount: number, capacity: number)
+	local fraction = if capacity > 0 then math.clamp(amount / capacity, 0, 1) else 0
+	TweenService:Create(refs.basketFill, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+		Size = UDim2.fromScale(fraction, 1),
+	}):Play()
+	refs.basketText.Text = `{Format.short(amount)} / {Format.short(capacity)}`
+	refs.basketFill.BackgroundColor3 = if fraction >= 1 then C.golden else C.apple
+	if amount > lastBasket then
+		bounce(refs.basketRow, 0.06) -- basket wobble on every pickup
+	end
+	lastBasket = amount
+end
+
+function Hud.setCoins(amount: number)
+	refs.setCoins(amount)
+	bounce(refs.coinRow, 0.08)
+	if Hud.isShopOpen() then
+		Hud.refreshShop()
+	end
+end
+
+function Hud.setGolden(amount: number)
+	refs.setGolden(amount)
+	bounce(refs.goldRow, 0.12)
+end
+
+function Hud.setDrop(text: string, urgent: boolean, raining: boolean)
+	refs.dropText.Text = text
+	refs.dropPill.BackgroundColor3 = if raining
+		then Color3.fromRGB(230, 170, 30)
+		elseif urgent then Color3.fromRGB(235, 60, 40)
+		else Color3.fromRGB(190, 45, 45)
+end
+
+function Hud.pulseDrop()
+	bounce(refs.dropPill, 0.1)
+end
+
+function Hud.setGoal(text: string)
+	if refs.goalText.Text ~= text then
+		refs.goalText.Text = text
+		bounce(refs.goal, 0.08)
+	end
+end
+
+function Hud.setShakeVisible(visible: boolean)
+	refs.shakeButton.Visible = visible
+end
+
+function Hud.pulseShop()
+	bounce(refs.shopButton, 0.15)
+end
+
+local bannerToken = 0
+function Hud.banner(text: string, color: Color3?, seconds: number?)
+	bannerToken += 1
+	local token = bannerToken
+	local b = refs.banner :: TextLabel
+	b.Text = text
+	b.TextColor3 = color or C.white
+	b.Visible = true
+	bounce(b, 0.35)
+	task.delay(seconds or 1.8, function()
+		if token == bannerToken then
+			b.Visible = false
+		end
+	end)
+end
+
+local toastToken = 0
+function Hud.toast(text: string, color: Color3?)
+	toastToken += 1
+	local token = toastToken
+	local t = refs.toast :: TextLabel
+	t.Text = text
+	t.TextColor3 = color or C.white
+	t.Visible = true
+	bounce(t, 0.2)
+	task.delay(1.6, function()
+		if token == toastToken then
+			t.Visible = false
+		end
+	end)
+end
+
+function Hud.flashFrame(): Frame
+	return refs.flash
+end
+
+return Hud
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="23">
+          <Properties>
+            <string name="Name">Juice</string>
+            <string name="Source"><![CDATA[--!strict
+-- Game feel (blueprint F1/F2): tree wobble, leaf bursts, camera shake (trauma model),
+-- FOV punch + flash "hit-stop" for golden moments, floating numbers.
+-- All local and cosmetic: nothing here affects gameplay state.
+
+local Debris = game:GetService("Debris")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+
+local Juice = {}
+
+local player = Players.LocalPlayer
+
+---------------------------------------------------------------------------
+-- Camera shake: add trauma (0..1); shake strength = trauma^2, decays over time.
+---------------------------------------------------------------------------
+local trauma = 0
+local MAX_ANGLE = math.rad(2.2)
+local MAX_OFFSET = 0.35
+Juice.shakeEnabled = true -- expose for a future settings toggle (motion sensitivity)
+
+function Juice.addTrauma(amount: number)
+	trauma = math.clamp(trauma + amount, 0, 1)
+end
+
+RunService:BindToRenderStep("AppleApeCameraShake", Enum.RenderPriority.Camera.Value + 1, function(dt)
+	if trauma <= 0 then
+		return
+	end
+	trauma = math.max(0, trauma - dt * 1.6)
+	if not Juice.shakeEnabled then
+		return
+	end
+	local camera = Workspace.CurrentCamera
+	local s = trauma * trauma
+	local t = os.clock() * 25
+	local rx = (math.noise(t, 1) * 2) * MAX_ANGLE * s
+	local ry = (math.noise(t, 2) * 2) * MAX_ANGLE * s
+	local rz = (math.noise(t, 3) * 2) * MAX_ANGLE * s
+	local offset = Vector3.new(math.noise(t, 4), math.noise(t, 5), 0) * MAX_OFFSET * s
+	camera.CFrame = camera.CFrame * CFrame.new(offset) * CFrame.Angles(rx, ry, rz)
+end)
+
+---------------------------------------------------------------------------
+-- Tree wobble: rotate the whole tree around its base, damped spring style.
+---------------------------------------------------------------------------
+local wobbling: { [Model]: { start: number, strength: number, original: CFrame } } = {}
+
+function Juice.wobbleTree(tree: Model, strength: number?)
+	local state = wobbling[tree]
+	if state then
+		state.start = os.clock()
+		state.strength = math.max(state.strength, strength or 1)
+	else
+		wobbling[tree] = { start = os.clock(), strength = strength or 1, original = tree:GetPivot() }
+	end
+end
+
+RunService.RenderStepped:Connect(function()
+	local now = os.clock()
+	for tree, state in wobbling do
+		local base = tree:GetAttribute("Base")
+		if typeof(base) ~= "Vector3" or not tree.Parent then
+			wobbling[tree] = nil
+			continue
+		end
+		local t = now - state.start
+		local duration = 0.55
+		if t >= duration then
+			tree:PivotTo(state.original)
+			wobbling[tree] = nil
+			continue
+		end
+		local damp = (1 - t / duration) ^ 2
+		local angle = math.sin(t * 38) * math.rad(7) * state.strength * damp
+		local squash = 1 + math.sin(t * 38) * 0.04 * damp -- tiny "breathing" via tilt combo
+		local around = CFrame.new(base) * CFrame.Angles(angle * 0.6, 0, angle) * CFrame.new(-base)
+		tree:PivotTo(around * state.original * CFrame.new(0, (squash - 1) * 2, 0))
+	end
+end)
+
+---------------------------------------------------------------------------
+-- Leaf burst from the canopy (one emitter per tree, created lazily, Emit() bursts).
+---------------------------------------------------------------------------
+local emitters: { [Model]: ParticleEmitter } = {}
+
+local function leafEmitter(tree: Model): ParticleEmitter?
+	local existing = emitters[tree]
+	if existing then
+		return existing
+	end
+	local trunk = tree.PrimaryPart
+	local burst = trunk and trunk:FindFirstChild("BurstPoint") :: Attachment?
+	if not burst then
+		return nil
+	end
+	local e = Instance.new("ParticleEmitter")
+	e.Name = "LeafBurst"
+	e.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	e.Color = ColorSequence.new(Config.Colors.leaf, Config.Colors.leafDark)
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.9), NumberSequenceKeypoint.new(1, 0.2) })
+	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1) })
+	e.Lifetime = NumberRange.new(0.6, 1.1)
+	e.Speed = NumberRange.new(8, 16)
+	e.SpreadAngle = Vector2.new(180, 180)
+	e.Acceleration = Vector3.new(0, -18, 0)
+	e.Rotation = NumberRange.new(0, 360)
+	e.RotSpeed = NumberRange.new(-200, 200)
+	e.Rate = 0
+	e.LightInfluence = 0.6
+	e.Parent = burst
+	emitters[tree] = e
+	return e
+end
+
+function Juice.leafBurst(tree: Model, amount: number?)
+	local e = leafEmitter(tree)
+	if e then
+		e:Emit(amount or 18)
+	end
+end
+
+---------------------------------------------------------------------------
+-- Sparkle burst at a world position (golden pickups, sells).
+---------------------------------------------------------------------------
+function Juice.sparkle(position: Vector3, color: Color3, amount: number?)
+	local holder = Instance.new("Part")
+	holder.Anchored = true
+	holder.CanCollide = false
+	holder.CanQuery = false
+	holder.Transparency = 1
+	holder.Size = Vector3.new(0.2, 0.2, 0.2)
+	holder.Position = position
+	holder.Parent = Workspace
+	local e = Instance.new("ParticleEmitter")
+	e.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	e.Color = ColorSequence.new(color)
+	e.LightEmission = 1
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.2), NumberSequenceKeypoint.new(1, 0) })
+	e.Lifetime = NumberRange.new(0.4, 0.8)
+	e.Speed = NumberRange.new(10, 22)
+	e.SpreadAngle = Vector2.new(180, 180)
+	e.Rate = 0
+	e.Parent = holder
+	e:Emit(amount or 24)
+	Debris:AddItem(holder, 1.5)
+end
+
+---------------------------------------------------------------------------
+-- Floating "+N" text above a world position. Accumulates rapid pickups into one label.
+---------------------------------------------------------------------------
+local active: { gui: BillboardGui, label: TextLabel, amount: number, born: number, kind: string }? = nil
+
+function Juice.popNumber(position: Vector3, amount: number, kind: "apple" | "golden" | "coin")
+	local now = os.clock()
+	if kind ~= "golden" and active and active.kind == kind and now - active.born < 0.6 and active.gui.Parent then
+		active.amount += amount
+		active.born = now
+		active.label.Text = "+" .. active.amount
+		active.label.TextSize = math.min(60, 34 + active.amount)
+		return
+	end
+	local gui = Instance.new("BillboardGui")
+	gui.Size = UDim2.fromOffset(220, 70)
+	gui.StudsOffsetWorldSpace = Vector3.new(0, 3.5, 0)
+	gui.AlwaysOnTop = true
+	gui.LightInfluence = 0
+	local holder = Instance.new("Part")
+	holder.Anchored = true
+	holder.CanCollide = false
+	holder.CanQuery = false
+	holder.Transparency = 1
+	holder.Size = Vector3.new(0.1, 0.1, 0.1)
+	holder.Position = position
+	holder.Parent = Workspace
+	gui.Adornee = holder
+	local label = Instance.new("TextLabel")
+	label.BackgroundTransparency = 1
+	label.Size = UDim2.fromScale(1, 1)
+	label.Font = Enum.Font.FredokaOne
+	label.TextSize = 36
+	label.TextColor3 = if kind == "golden"
+		then Config.Colors.golden
+		elseif kind == "coin" then Config.Colors.coin
+		else Config.Colors.white
+	label.Text = (if kind == "golden" then "+1 GOLDEN!" else "+" .. amount)
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.Color = Config.Colors.uiStroke
+	stroke.Parent = label
+	label.Parent = gui
+	gui.Parent = player:WaitForChild("PlayerGui")
+	active = { gui = gui, label = label, amount = amount, born = now, kind = kind }
+
+	-- rise and fade after a short hold
+	task.spawn(function()
+		local entry = active
+		while entry and os.clock() - entry.born < 0.6 do
+			task.wait(0.1)
+		end
+		local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		TweenService:Create(gui, tweenInfo, { StudsOffsetWorldSpace = Vector3.new(0, 7, 0) }):Play()
+		TweenService:Create(label, tweenInfo, { TextTransparency = 1 }):Play()
+		TweenService:Create(stroke, tweenInfo, { Transparency = 1 }):Play()
+		task.wait(0.65)
+		gui:Destroy()
+		holder:Destroy()
+	end)
+end
+
+---------------------------------------------------------------------------
+-- "Hit-stop" for big moments (Sakurai: stop for big moments): FOV punch + white flash.
+-- `flash` is a full-screen Frame owned by the HUD.
+---------------------------------------------------------------------------
+local baseFov: number? = nil
+
+function Juice.bigMoment(flash: Frame?, strength: number?)
+	local s = strength or 1
+	local camera = Workspace.CurrentCamera
+	baseFov = baseFov or camera.FieldOfView
+	local fov = baseFov :: number
+	camera.FieldOfView = fov - 8 * s
+	TweenService:Create(camera, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		FieldOfView = fov,
+	}):Play()
+	Juice.addTrauma(0.35 * s)
+	if flash then
+		flash.BackgroundTransparency = 0.35
+		TweenService:Create(flash, TweenInfo.new(0.3), { BackgroundTransparency = 1 }):Play()
+	end
+end
+
+return Juice
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="LocalScript" referent="24">
+          <Properties>
+            <string name="Name">Main</string>
+            <string name="Source"><![CDATA[-- Apple Ape client controller: input -> remotes, remotes -> visuals/HUD, guide + goals.
+
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+
+local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local Config = require(Shared.Config)
+local Format = require(Shared.Format)
+local Remotes = require(Shared.Remotes)
+
+local Hud = require(script.Parent.Hud)
+local Juice = require(script.Parent.Juice)
+local Sounds = require(script.Parent.Sounds)
+local AppleVisuals = require(script.Parent.AppleVisuals)
+local Guide = require(script.Parent.Guide)
+
+local player = Players.LocalPlayer
+local Steps = Config.TutorialSteps
+
+---------------------------------------------------------------------------
+-- trees
+---------------------------------------------------------------------------
+local treesById: { [number]: Model } = {}
+local function registerTree(model: Instance)
+	if model:IsA("Model") then
+		local id = model:GetAttribute("TreeId")
+		if type(id) == "number" then
+			treesById[id] = model
+		end
+	end
+end
+for _, model in CollectionService:GetTagged("AppleTree") do
+	registerTree(model)
+end
+CollectionService:GetInstanceAddedSignal("AppleTree"):Connect(registerTree)
+
+local function treeBase(model: Model): Vector3?
+	local base = model:GetAttribute("Base")
+	return if typeof(base) == "Vector3" then base else nil
+end
+
+local function burstPoint(model: Model): Vector3
+	local trunk = model.PrimaryPart
+	local a = trunk and trunk:FindFirstChild("BurstPoint") :: Attachment?
+	if a then
+		return a.WorldPosition
+	end
+	return model:GetPivot().Position + Vector3.new(0, 10, 0)
+end
+
+local function rootPart(): BasePart?
+	local character = player.Character
+	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+end
+
+local nearestTree: Model? = nil
+local nearestTreeId: number? = nil
+local highlight = Instance.new("Highlight")
+highlight.FillTransparency = 1
+highlight.OutlineColor = Config.Colors.golden
+highlight.OutlineTransparency = 0.2
+highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+highlight.Parent = Workspace
+
+local function closestTree(maxDistance: number): (Model?, number?, number)
+	local root = rootPart()
+	if not root then
+		return nil, nil, math.huge
+	end
+	local best, bestId, bestDist = nil, nil, maxDistance
+	for id, model in treesById do
+		local base = treeBase(model)
+		if base then
+			local d = Vector3.new(root.Position.X - base.X, 0, root.Position.Z - base.Z).Magnitude
+			if d < bestDist then
+				best, bestId, bestDist = model, id, d
+			end
+		end
+	end
+	return best, bestId, bestDist
+end
+
+---------------------------------------------------------------------------
+-- state helpers
+---------------------------------------------------------------------------
+local function attr(name: string, default: number): number
+	local v = player:GetAttribute(name)
+	return if type(v) == "number" then v else default
+end
+
+local function basketFull(): boolean
+	return attr("Basket", 0) >= attr("Capacity", Config.Basket.baseCapacity)
+end
+
+local function raining(): boolean
+	local endsAt = Workspace:GetAttribute("RainEndsAt")
+	return type(endsAt) == "number" and endsAt > Workspace:GetServerTimeNow()
+end
+
+---------------------------------------------------------------------------
+-- shaking
+---------------------------------------------------------------------------
+local lastShake = 0
+local fullWarnedAt = 0
+
+local function warnFull()
+	if os.clock() - fullWarnedAt > 2.5 then
+		fullWarnedAt = os.clock()
+		Hud.banner("BASKET FULL! Go SELL 🍎", Config.Colors.golden, 2)
+		Sounds.play("error", 0.7, 0.4)
+	end
+end
+
+local function tryShake()
+	if not player:GetAttribute("Loaded") then
+		return
+	end
+	local tree, treeId = nearestTree, nearestTreeId
+	if not tree or not treeId then
+		Hud.toast("Walk up to a tree first!")
+		return
+	end
+	if basketFull() then
+		warnFull()
+		return
+	end
+	local now = os.clock()
+	if now - lastShake < Config.Shake.cooldown then
+		return
+	end
+	lastShake = now
+	-- predicted feedback: feel instant even with latency
+	Juice.wobbleTree(tree, 1)
+	Juice.leafBurst(tree, 16)
+	Juice.addTrauma(0.18)
+	Sounds.play("shake", 0.9 + math.random() * 0.25, 0.6)
+	Remotes.Shake:FireServer(treeId)
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then
+		return
+	end
+	if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.ButtonX then
+		tryShake()
+	elseif
+		input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch
+	then
+		-- clicking/tapping the tree itself also shakes it
+		local camera = Workspace.CurrentCamera
+		local ray = camera:ViewportPointToRay(input.Position.X, input.Position.Y)
+		local params = RaycastParams.new()
+		params.FilterType = Enum.RaycastFilterType.Include
+		local treeParts = {}
+		for _, model in treesById do
+			table.insert(treeParts, model)
+		end
+		params.FilterDescendantsInstances = treeParts
+		local result = Workspace:Raycast(ray.Origin, ray.Direction * 200, params)
+		if result and nearestTree and result.Instance:IsDescendantOf(nearestTree) then
+			tryShake()
+		end
+	end
+end)
+
+---------------------------------------------------------------------------
+-- HUD
+---------------------------------------------------------------------------
+Hud.build({
+	onShake = tryShake,
+	onBuy = function(kind: string)
+		Remotes.BuyUpgrade:FireServer(kind)
+	end,
+})
+
+AppleVisuals.onGolden = function(_position: Vector3)
+	Juice.bigMoment(Hud.flashFrame(), 0.8)
+end
+
+---------------------------------------------------------------------------
+-- goals + guide (blueprint R3/R4: one obvious next step at a time)
+---------------------------------------------------------------------------
+local function updateGoalAndGuide()
+	local step = attr("TutorialStep", 0)
+
+	if raining() then
+		Hud.setGoal("APPLE RAIN! Grab apples at the plaza!")
+		Guide.setTarget(Config.Drop.plazaCenter, 8)
+		return
+	end
+	if basketFull() then
+		Hud.setGoal("Basket full! Sell at the SELL stand")
+		Guide.setTarget(Config.World.sellPad, 6)
+		return
+	end
+	if step < Steps.FirstShake then
+		Hud.setGoal("Walk to a tree and SHAKE it!")
+		local tree = closestTree(math.huge)
+		Guide.setTarget(tree and treeBase(tree), 15)
+		return
+	end
+	if step < Steps.FirstSell then
+		Hud.setGoal(`Fill your basket ({attr("Basket", 0)}/{attr("Capacity", 25)})`)
+		Guide.setTarget(nil)
+		return
+	end
+	if step < Steps.FirstUpgrade then
+		Hud.setGoal("Open the SHOP and buy a Bigger Basket!")
+		Guide.setTarget(nil)
+		return
+	end
+	-- after the tutorial: point at the next affordable upgrade, else the next drop
+	Guide.setTarget(nil)
+	local coins = attr("Coins", 0)
+	local basketCost = Config.upgradeCost("Basket", attr("BasketLevel", 1))
+	local shakeCost = Config.upgradeCost("Shake", attr("ShakeLevel", 1))
+	local cheapest = math.min(basketCost, shakeCost)
+	if coins >= cheapest then
+		Hud.setGoal("You can afford an upgrade! Open the SHOP")
+	else
+		local at = Workspace:GetAttribute("NextDropAt")
+		local left = if type(at) == "number" then at - Workspace:GetServerTimeNow() else 0
+		Hud.setGoal(`Earn 🪙{Format.short(cheapest - coins)} more · Drop in {Format.clock(left)}`)
+	end
+end
+
+---------------------------------------------------------------------------
+-- attribute -> HUD
+---------------------------------------------------------------------------
+local function refreshBasket()
+	Hud.setBasket(attr("Basket", 0), attr("Capacity", Config.Basket.baseCapacity))
+	AppleVisuals.setBasketFull(basketFull())
+	updateGoalAndGuide()
+end
+
+local lastGolden = -1
+local function refreshAll()
+	refreshBasket()
+	Hud.setCoins(attr("Coins", 0))
+	local golden = attr("Golden", 0)
+	if golden ~= lastGolden then
+		Hud.setGolden(golden)
+		lastGolden = golden
+	end
+	Hud.refreshShop()
+end
+
+for _, name in { "Basket", "Capacity" } do
+	player:GetAttributeChangedSignal(name):Connect(refreshBasket)
+end
+player:GetAttributeChangedSignal("Coins"):Connect(function()
+	Hud.setCoins(attr("Coins", 0))
+	updateGoalAndGuide()
+end)
+player:GetAttributeChangedSignal("Golden"):Connect(function()
+	Hud.setGolden(attr("Golden", 0))
+end)
+for _, name in { "BasketLevel", "ShakeLevel" } do
+	player:GetAttributeChangedSignal(name):Connect(Hud.refreshShop)
+end
+player:GetAttributeChangedSignal("TutorialStep"):Connect(updateGoalAndGuide)
+player:GetAttributeChangedSignal("Loaded"):Connect(refreshAll)
+if player:GetAttribute("Loaded") then
+	refreshAll()
+end
+
+---------------------------------------------------------------------------
+-- remotes
+---------------------------------------------------------------------------
+Remotes.ShakeResult.OnClientEvent:Connect(function(treeId: number, apples, info)
+	local tree = treesById[treeId]
+	if not tree then
+		return
+	end
+	AppleVisuals.burst(apples, burstPoint(tree))
+	if info and info.firstShake then
+		Hud.banner("WOW! MEGA SHAKE! 🍎🍎🍎", Config.Colors.golden, 2.2)
+		Juice.wobbleTree(tree, 2)
+		Juice.leafBurst(tree, 40)
+		Juice.bigMoment(Hud.flashFrame(), 1)
+	end
+end)
+
+Remotes.TreeShaken.OnClientEvent:Connect(function(treeId: number, userId: number)
+	if userId == player.UserId then
+		return -- already predicted locally
+	end
+	local tree = treesById[treeId]
+	if tree then
+		Juice.wobbleTree(tree, 0.7)
+		Juice.leafBurst(tree, 8)
+	end
+end)
+
+Remotes.CollectResult.OnClientEvent:Connect(function(collectedIds, goldenGained, reason)
+	AppleVisuals.onCollectResult(collectedIds, goldenGained, reason)
+	if reason == "full" then
+		warnFull()
+	end
+end)
+
+Remotes.ApplesSpawned.OnClientEvent:Connect(function(apples)
+	AppleVisuals.rain(apples)
+end)
+
+Remotes.ApplesRemoved.OnClientEvent:Connect(function(ids)
+	AppleVisuals.removeShared(ids)
+end)
+
+Remotes.Notify.OnClientEvent:Connect(function(kind: string, data)
+	data = data or {}
+	if kind == "BasketFull" then
+		warnFull()
+	elseif kind == "Sold" then
+		Sounds.play("sell", 1.2, 0.7)
+		Hud.banner(`SOLD! +{Format.short(data.coins or 0)} 🪙`, Config.Colors.coin, 1.6)
+		local root = rootPart()
+		if root then
+			Juice.sparkle(root.Position, Config.Colors.coin, 30)
+			Juice.popNumber(root.Position, data.coins or 0, "coin")
+		end
+		Juice.addTrauma(0.15)
+		if attr("TutorialStep", 0) < Steps.FirstUpgrade then
+			task.delay(1.2, function()
+				Hud.pulseShop()
+			end)
+		end
+	elseif kind == "Upgraded" then
+		Sounds.play("sell", 1.6, 0.6)
+		local title = if data.kind == "Basket" then "BIGGER BASKET" else "STRONGER SHAKE"
+		Hud.banner(`{title}! Lv.{data.level}`, Config.Colors.good, 1.6)
+		Juice.bigMoment(nil, 0.4)
+	elseif kind == "NotEnoughCoins" then
+		Sounds.play("error", 0.7, 0.4)
+		Hud.toast(`Need 🪙{Format.short(data.need or 0)} more coins`, Config.Colors.bad)
+	elseif kind == "MaxLevel" then
+		Hud.toast("Already max level!")
+	elseif kind == "RainStarted" then
+		Hud.banner("🍎 APPLE RAIN! Run to the plaza! 🍎", Config.Colors.golden, 2.5)
+		Juice.bigMoment(Hud.flashFrame(), 0.6)
+		updateGoalAndGuide()
+	elseif kind == "RainEnded" then
+		Hud.toast("Apple Rain is over. Next drop soon!")
+		updateGoalAndGuide()
+	end
+end)
+
+---------------------------------------------------------------------------
+-- per-frame: nearest tree + shake button; every 0.2s: drop countdown
+---------------------------------------------------------------------------
+RunService.Heartbeat:Connect(function()
+	local tree, id = closestTree(Config.Shake.range - 1)
+	nearestTree, nearestTreeId = tree, id
+	highlight.Adornee = tree
+	Hud.setShakeVisible(tree ~= nil)
+end)
+
+local worldCountdown: TextLabel? = nil
+local lastPulseSecond = -1
+task.spawn(function()
+	while true do
+		task.wait(0.2)
+		local now = Workspace:GetServerTimeNow()
+		local rainEnds = Workspace:GetAttribute("RainEndsAt")
+		local nextAt = Workspace:GetAttribute("NextDropAt")
+		local text, urgent, isRaining = "🍎 APPLE DROP", false, false
+		if type(rainEnds) == "number" and rainEnds > now then
+			isRaining = true
+			text = `🍎 APPLE RAIN! {Format.clock(rainEnds - now)}`
+		elseif type(nextAt) == "number" then
+			local left = nextAt - now
+			urgent = left <= 10
+			text = `🍎 APPLE DROP IN {Format.clock(left)}`
+			-- tension build-up in the last 10 seconds (blueprint F5)
+			local second = math.floor(left)
+			if urgent and second ~= lastPulseSecond and left > 0 then
+				lastPulseSecond = second
+				Hud.pulseDrop()
+				Sounds.play("click", 1.4 + (10 - second) * 0.05, 0.3)
+			end
+		end
+		Hud.setDrop(text, urgent, isRaining)
+
+		if not worldCountdown then
+			local map = Workspace:FindFirstChild("Map")
+			local tower = map and map:FindFirstChild("DropTower")
+			local board = tower and tower:FindFirstChild("DropCountdown")
+			worldCountdown = board and board:FindFirstChild("Text") :: TextLabel?
+		end
+		if worldCountdown then
+			worldCountdown.Text = text
+		end
+
+		-- keep the "drop in m:ss" goal fresh
+		if attr("TutorialStep", 0) >= Steps.FirstUpgrade and not basketFull() then
+			updateGoalAndGuide()
+		end
+	end
+end)
+
+-- first-session guide pointer even before any attribute changes
+task.delay(1, updateGoalAndGuide)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="25">
+          <Properties>
+            <string name="Name">Sounds</string>
+            <string name="Source"><![CDATA[--!strict
+-- Tiny local sound player. Each play clones a template so sounds can overlap and pitch-shift.
+
+local Debris = game:GetService("Debris")
+local SoundService = game:GetService("SoundService")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
+
+local Sounds = {}
+
+local folder = Instance.new("Folder")
+folder.Name = "AppleApeSounds"
+folder.Parent = SoundService
+
+local templates: { [string]: Sound } = {}
+for name, id in Config.Sounds do
+	local s = Instance.new("Sound")
+	s.Name = name
+	s.SoundId = id
+	s.Volume = 0.5
+	s.Parent = folder
+	templates[name] = s
+end
+
+function Sounds.play(name: string, pitch: number?, volume: number?)
+	local template = templates[name]
+	if not template then
+		return
+	end
+	local s = template:Clone()
+	s.PlaybackSpeed = pitch or 1
+	if volume then
+		s.Volume = volume
+	end
+	s.Parent = folder
+	s:Play()
+	Debris:AddItem(s, 3)
+end
+
+return Sounds
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="Workspace" referent="26">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <bool name="FilteringEnabled">true</bool>
+      <bool name="NeedsPivotMigration">false</bool>
+    </Properties>
+  </Item>
+</roblox>
