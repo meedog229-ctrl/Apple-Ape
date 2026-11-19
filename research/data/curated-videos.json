@@ -1,0 +1,1114 @@
+{
+ "categories": {
+  "roblox-dev": {
+   "name": "Roblox Development & Game Design",
+   "videos": [
+    {
+     "id": "Le4QhC3dDGk",
+     "title": "How To Make A Popular Roblox Game",
+     "channel": "AlvinBlox",
+     "views": 515938,
+     "duration": 676,
+     "basis": "inferred",
+     "takeaway": "Popularity is designed, not lucky: pick a proven genre, make the first minutes clear and rewarding, and plan updates before launch."
+    },
+    {
+     "id": "Y93DRfB-Deo",
+     "title": "Here's Why Roblox Games Blow Up",
+     "channel": "AlvinBlox",
+     "views": 293124,
+     "duration": 661,
+     "basis": "inferred",
+     "takeaway": "Games that blow up pair a simple, instantly-readable hook with retention and shareable moments; the algorithm amplifies stats, not effort."
+    },
+    {
+     "id": "xnlaYLnCtFc",
+     "title": "Watch this before making ROBLOX Games",
+     "channel": "waveshine",
+     "views": 572169,
+     "duration": 603,
+     "basis": "inferred",
+     "takeaway": "Realistic dev journey: most first games flop; ship small, learn from data, and treat each release as practice for the next."
+    },
+    {
+     "id": "N2FND74tgGE",
+     "title": "Before You Make Your Roblox Game, Study THIS First",
+     "channel": "SmartyRBX",
+     "views": 97525,
+     "duration": 357,
+     "basis": "inferred",
+     "takeaway": "Study top games in your genre before building: copy the proven structure (loop, UI, progression), differentiate on theme."
+    },
+    {
+     "id": "kg_h09_x7no",
+     "title": "Making A Viral Roblox Game Is Easier Than You Think",
+     "channel": "bubDEV",
+     "views": 91052,
+     "duration": 336,
+     "basis": "inferred",
+     "takeaway": "Viral games are usually simple ideas executed fast with a strong thumbnail/title; scope small and iterate."
+    },
+    {
+     "id": "4-ge-E9WvM4",
+     "title": "How I made a FRONT PAGE game in 30 Days!",
+     "channel": "Zyonic",
+     "views": 208073,
+     "duration": 518,
+     "basis": "inferred",
+     "takeaway": "Postmortem of a 30-day front-page game: tight scope, quick launch, ads to seed data, then rapid updates driven by stats."
+    },
+    {
+     "id": "rdWyuDEpGyk",
+     "title": "The DO's and DON'Ts of Growing a Game... (Roblox)",
+     "channel": "SmartyRBX",
+     "views": 273327,
+     "duration": 206,
+     "basis": "inferred",
+     "takeaway": "Growth do's/don'ts: update consistently, fix stats one at a time, don't clickbait thumbnails, don't over-monetize early."
+    },
+    {
+     "id": "f63stwpsaXw",
+     "title": "Avoid These 5 Roblox Dev Mistakes (They Cost Me Thousands)",
+     "channel": "AlvinBlox",
+     "views": 183730,
+     "duration": 512,
+     "basis": "inferred",
+     "takeaway": "Costly mistakes: overscoping, launching without analytics, ignoring mobile, spending ads on an unfixed game, weak thumbnails."
+    },
+    {
+     "id": "vemqKJ-5yRE",
+     "title": "DON'T Make a Roblox Game Without Watching This First.",
+     "channel": "SmartyRBX",
+     "views": 869584,
+     "duration": 1640,
+     "basis": "inferred",
+     "takeaway": "Long-form primer on what to know before building: genre choice, scope, the stats the algorithm reads, and planning monetization from day one."
+    },
+    {
+     "id": "hUk567j6CLo",
+     "title": "Making a Roblox Game Was a Mistake...",
+     "channel": "edmondx",
+     "views": 7605161,
+     "duration": 884,
+     "basis": "inferred",
+     "takeaway": "Trying to make 'the best game ever' first produced an unfocused mess; small, focused scope beats ambition on a first game."
+    },
+    {
+     "id": "RIWPfMJyVhQ",
+     "title": "I Made a Successful Roblox Game to Prove It’s Not Luck",
+     "channel": "Zyonic",
+     "views": 424019,
+     "duration": 481,
+     "basis": "inferred",
+     "takeaway": "Repeatable process (not luck): validate idea, build core loop fast, launch with ads, iterate on retention/playtime."
+    },
+    {
+     "id": "315hkxjTBZc",
+     "title": "Why Most Roblox Devs Quit (The Sad Truth...)",
+     "channel": "SmartyRBX",
+     "views": 711219,
+     "duration": 377,
+     "basis": "inferred",
+     "takeaway": "Devs quit from burnout and unrealistic expectations; ship many small games and treat failures as data."
+    },
+    {
+     "id": "fjlOaEALWmg",
+     "title": "How I Made a Viral Roblox Game",
+     "channel": "janisjanis01",
+     "views": 142631,
+     "duration": 774,
+     "basis": "inferred",
+     "takeaway": "Viral game case study: strong hook + polished thumbnails/icon/UI art; presentation quality drives click-through."
+    },
+    {
+     "id": "ASr_I6inrzI",
+     "title": "10 Stages of Roblox Game Development",
+     "channel": "Zilar",
+     "views": 423626,
+     "duration": 373,
+     "basis": "inferred",
+     "takeaway": "Comedic but accurate stages of Roblox dev (idea hype, scope creep, bugs, launch reality); plan for the unglamorous middle."
+    },
+    {
+     "id": "eRhFPgj8tc4",
+     "title": "My Viral Roblox Game DIED… So I Made a Better One",
+     "channel": "Duckable",
+     "views": 1250688,
+     "duration": 1581,
+     "basis": "inferred",
+     "takeaway": "A viral game died because it lacked depth/updates; the sequel focused on longer-term progression and content cadence."
+    },
+    {
+     "id": "CRCcsYEB_6A",
+     "title": "Roblox Game Design Explained Like You're 5 Yrs Old",
+     "channel": "Tizzy RBLX",
+     "views": 71586,
+     "duration": 1051,
+     "basis": "inferred",
+     "takeaway": "The '80/20 formula': ~80% proven mechanics players already understand, ~20% fresh twist/theme."
+    },
+    {
+     "id": "0rMO-VHSuGs",
+     "title": "Are YOU making these Game Dev Mistakes?",
+     "channel": "GnomeCode",
+     "views": 242857,
+     "duration": 1460,
+     "basis": "inferred",
+     "takeaway": "Common dev mistakes: no prototyping, polishing before fun is proven, building systems nobody uses, not playtesting with strangers."
+    },
+    {
+     "id": "7z8rfg_jBuk",
+     "title": "How To ACTUALLY Advertise A Roblox Game",
+     "channel": "bubDEV",
+     "views": 96034,
+     "duration": 725,
+     "basis": "inferred",
+     "takeaway": "Advertise correctly: test many thumbnails, small steady sponsor budgets, judge after several days, and fix the game before scaling spend."
+    },
+    {
+     "id": "u_8p65Bsm2Y",
+     "title": "How to Boost your Game using Roblox Funnel Analytics",
+     "channel": "GnomeCode",
+     "views": 20383,
+     "duration": 476,
+     "basis": "inferred",
+     "takeaway": "Use Roblox Funnel analytics: log each onboarding/core-loop step, find the biggest drop-off, fix that single step, repeat."
+    },
+    {
+     "id": "gc7K98RlOik",
+     "title": "The Secret To Making Your Roblox Game FUN! (Game Design)",
+     "channel": null,
+     "views": 0,
+     "duration": 170,
+     "basis": "inferred",
+     "takeaway": "Fun comes from clear goals + constant feedback + meaningful progress; test the core action in isolation before adding systems."
+    }
+   ]
+  },
+  "retention": {
+   "name": "Player Retention",
+   "videos": [
+    {
+     "id": "hbzGO_Qonu0",
+     "title": "How to Keep Players Engaged (Without Being Evil)",
+     "channel": "Game Maker's Toolkit",
+     "views": 2787642,
+     "duration": 646,
+     "basis": "known",
+     "takeaway": "Ethical engagement: keep players through intrinsic motivation (mastery, curiosity, autonomy) instead of compulsion tricks; respect players' time and let them stop."
+    },
+    {
+     "id": "7L8vAGGitr8",
+     "title": "How Game Designers Protect Players From Themselves",
+     "channel": "Game Maker's Toolkit",
+     "views": 5678996,
+     "duration": 712,
+     "basis": "known",
+     "takeaway": "Players will optimize the fun out of a game; designers must shape incentives so the optimal strategy is also the fun one."
+    },
+    {
+     "id": "LpAU6TheAZ4",
+     "title": "What are retention metrics on Roblox?",
+     "channel": "Roblox Creators",
+     "views": 35781,
+     "duration": 174,
+     "basis": "inferred",
+     "takeaway": "Official explainer of D1/D7/D30 retention on the Creator Dashboard and why it's a key quality signal for recommendations."
+    },
+    {
+     "id": "dXqZC4x2Vn8",
+     "title": "What are onboarding techniques on Roblox?",
+     "channel": "Roblox Creators",
+     "views": 25618,
+     "duration": 169,
+     "basis": "inferred",
+     "takeaway": "Official onboarding techniques: get to the fun quickly, teach by doing, use contextual hints, and give an early win."
+    },
+    {
+     "id": "XfxbdKtSbOI",
+     "title": "Onboarding Essentials",
+     "channel": "Roblox Creators",
+     "views": 5553,
+     "duration": 732,
+     "basis": "inferred",
+     "takeaway": "Roblox's onboarding essentials: fast early levels, starter items/currency, visible short/mid/long goals, a designed 'moment of joy', funnel each step."
+    },
+    {
+     "id": "TZ14iO23Bpk",
+     "title": "RDC 22: Creating an Intriguing First Time User Experience - Onett (Bee Swarm Simulator)",
+     "channel": "Onett",
+     "views": 407315,
+     "duration": 1657,
+     "basis": "inferred",
+     "takeaway": "Bee Swarm Simulator's creator on FTUE: intrigue new players with an inviting world and immediate progress, then reveal depth gradually."
+    },
+    {
+     "id": "HFcegpPPvpI",
+     "title": "How to Improve Your Roblox Game Stats FAST",
+     "channel": "Tizzy RBLX",
+     "views": 37765,
+     "duration": 1008,
+     "basis": "inferred",
+     "takeaway": "Read your stats as a diagnosis: low playtime = weak loop, low D1 = weak FTUE/hook, low D7 = weak progression; fix the weakest first."
+    },
+    {
+     "id": "HxYGLLNczC8",
+     "title": "How to Make a Great Mobile Game That Actually Keeps Players (and Makes Money)",
+     "channel": "Creauctopus",
+     "views": 33661,
+     "duration": 481,
+     "basis": "inferred",
+     "takeaway": "Mobile retention: short sessions with clear goals, daily reasons to return, progression that's always visible."
+    },
+    {
+     "id": "k2HrRSWHYJc",
+     "title": "How To Get Back Into A Game, According to Science",
+     "channel": "Mark Maxwell",
+     "views": 2092965,
+     "duration": 1346,
+     "basis": "known",
+     "takeaway": "Returning after a break is hard (forgotten controls/goals); 'welcome back' recaps and gentle re-onboarding reduce lapsed-player churn."
+    },
+    {
+     "id": "GHEBkhT1K7A",
+     "title": "How Path of Exile Keeps Players Coming Back | Path of Exile 2 & Grinding Gear Games",
+     "channel": "DevGAMM",
+     "views": 295448,
+     "duration": 2854,
+     "basis": "inferred",
+     "takeaway": "Path of Exile keeps players returning with regular content leagues (fresh starts), deep build mastery, and fair monetization."
+    },
+    {
+     "id": "_Hjm9LLSICg",
+     "title": "From Rational to Emotional: Designs that Increase Player Retention",
+     "channel": "GDC Festival of Gaming",
+     "views": 35234,
+     "duration": 3709,
+     "basis": "inferred",
+     "takeaway": "GDC: move retention design from rational hooks (rewards) to emotional ones (attachment, identity, social belonging)."
+    },
+    {
+     "id": "tSyt0alpoyg",
+     "title": "It's About Time: System Design for Mobile Free-to-Play",
+     "channel": null,
+     "views": 0,
+     "duration": 1566,
+     "basis": "inferred",
+     "takeaway": "GDC: time-based systems (timers, energy, daily cycles) structure F2P sessions; use them to create appointments, not walls."
+    },
+    {
+     "id": "gPV0qmyGs-o",
+     "title": "Getting Players to Care: Using Narrative to Drive Retention",
+     "channel": "GDC Festival of Gaming",
+     "views": 5479,
+     "duration": 3283,
+     "basis": "inferred",
+     "takeaway": "GDC: narrative and character attachment give players emotional reasons to come back beyond rewards."
+    },
+    {
+     "id": "Qsq-Sj_rojU",
+     "title": "I Studied 1,460 Onboarding Flows. Here's What I Found.",
+     "channel": "Mobbin",
+     "views": 407908,
+     "duration": 606,
+     "basis": "inferred",
+     "takeaway": "Study of 1,460 app onboarding flows: fewer steps, value shown before asks, progressive disclosure, personalization."
+    },
+    {
+     "id": "FE7lDFAcb4Y",
+     "title": "Exploration in Games - Four Ways Players Discover Joy - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 542930,
+     "duration": 398,
+     "basis": "known",
+     "takeaway": "Four kinds of exploration (spatial, mechanical, narrative, social) each create curiosity; layered secrets reward continued play."
+    },
+    {
+     "id": "K0M1PuQaE8s",
+     "title": "Designing Addiction: The Twisted Psychology Of Game Design",
+     "channel": "goukigod",
+     "views": 109256,
+     "duration": 968,
+     "basis": "inferred",
+     "takeaway": "Catalogue of compulsion techniques (variable rewards, loss aversion, sunk cost) - useful as a list of dark patterns to avoid or use carefully."
+    },
+    {
+     "id": "Xz53DEwuAcU",
+     "title": "Making Tutorials Feel Natural [Planning & Game Design]",
+     "channel": "Masahiro Sakurai on Creating Games",
+     "views": 53838,
+     "duration": 178,
+     "basis": "known",
+     "takeaway": "Tutorials should feel like play: teach inside the real game with natural prompts, not walls of text."
+    },
+    {
+     "id": "R7rd4-ua2AI",
+     "title": "Being Kind to Beginners [Planning & Game Design]",
+     "channel": "Masahiro Sakurai on Creating Games",
+     "views": 43881,
+     "duration": 179,
+     "basis": "known",
+     "takeaway": "Be kind to beginners: lower early difficulty, give generous early wins, let experts skip ahead."
+    },
+    {
+     "id": "fPT2GCkK1QM",
+     "title": "How To Grow A Small Roblox Game.",
+     "channel": "rasdev",
+     "views": 31801,
+     "duration": 292,
+     "basis": "inferred",
+     "takeaway": "Small-game growth: tighten the first session, update often, and use stats (not gut feeling) to pick what to fix next."
+    },
+    {
+     "id": "KtWaBC-bW7E",
+     "title": "Roblox Changed the Algorithm.. Here’s How to Get Players Now",
+     "channel": "MoseyTube77",
+     "views": 30812,
+     "duration": 306,
+     "basis": "inferred",
+     "takeaway": "Recent algorithm changes weight long-term behavior (retention, returning players, friend invites) over launch-day spikes."
+    }
+   ]
+  },
+  "gameplay-loops": {
+   "name": "Gameplay Loops",
+   "videos": [
+    {
+     "id": "Sk-nbAtIUko",
+     "title": "How Gameplay Loops Keep You Playing",
+     "channel": "Adam Millard - The Architect of Games",
+     "views": 317311,
+     "duration": 856,
+     "basis": "known",
+     "takeaway": "Loops nest: moment-to-moment action, a session loop of goals, and a long-term loop of progression; each layer must be satisfying on its own."
+    },
+    {
+     "id": "wTbSrOexWZU",
+     "title": "How To Design a Gameplay Loop",
+     "channel": "Apox Fox",
+     "views": 57484,
+     "duration": 455,
+     "basis": "inferred",
+     "takeaway": "Design a loop as action → reward → upgrade → harder/better action, and make sure each step is clear to the player."
+    },
+    {
+     "id": "S5camMoNw-o",
+     "title": "Progression Systems - How Good Games Avoid Skinner Boxes - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 1316886,
+     "duration": 379,
+     "basis": "known",
+     "takeaway": "Good progression unlocks new ways to play (variety, options), not just bigger numbers; pure stat treadmills feel like Skinner boxes."
+    },
+    {
+     "id": "aDE69s3pp7M",
+     "title": "Core Game Loops",
+     "channel": "Timothy Cain",
+     "views": 87970,
+     "duration": 808,
+     "basis": "known",
+     "takeaway": "Timothy Cain (Fallout co-creator): define the core loop early, keep it simple, and test that the repeated action is enjoyable before content."
+    },
+    {
+     "id": "PMj8Q4ViKzs",
+     "title": "What are loops in game design? - Loops - Game Design Theory",
+     "channel": "Game Design with Michael",
+     "views": 107247,
+     "duration": 584,
+     "basis": "inferred",
+     "takeaway": "Explains loop terminology (core, meta, feedback loops) with examples; useful vocabulary for designing and documenting loops."
+    },
+    {
+     "id": "Zrf1cou_yVo",
+     "title": "How Video Game Economies are Designed",
+     "channel": "Game Maker's Toolkit",
+     "views": 1279240,
+     "duration": 972,
+     "basis": "known",
+     "takeaway": "Game economies need balanced faucets (sources) and drains (sinks); unchecked inflation trivializes rewards."
+    },
+    {
+     "id": "gDQX3jk5xxc",
+     "title": "Leveling Up Progression Systems",
+     "channel": "Adam Millard - The Architect of Games",
+     "views": 675290,
+     "duration": 912,
+     "basis": "known",
+     "takeaway": "Progression systems should give players choices and expression; the anticipation of the next unlock is itself the reward."
+    },
+    {
+     "id": "6SYX17NzNqE",
+     "title": "Gameplay Loops Are Out, Chains Are In",
+     "channel": "Indie Game Clinic",
+     "views": 159905,
+     "duration": 662,
+     "basis": "known",
+     "takeaway": "'Chains' instead of loops: think of play as a sequence of goals that evolve and lead somewhere, not a circle that repeats unchanged."
+    },
+    {
+     "id": "Ae_zvm0-CQU",
+     "title": "What Makes a Good Level Up System?",
+     "channel": "Design Doc",
+     "views": 580726,
+     "duration": 1076,
+     "basis": "known",
+     "takeaway": "A good level-up system gives noticeable, felt power gains and meaningful choices at each level; invisible +1% upgrades don't motivate."
+    },
+    {
+     "id": "mGL5YGcAxEI",
+     "title": "The Real Core Loop - What Every Game Has In Common - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 189160,
+     "duration": 547,
+     "basis": "known",
+     "takeaway": "The real core loop every game shares: the player forms a goal, acts, gets feedback, and learns; design for that learning cycle."
+    },
+    {
+     "id": "H4kbJObhcHw",
+     "title": "How Games Use Feedback Loops",
+     "channel": "Game Maker's Toolkit",
+     "views": 1182972,
+     "duration": 791,
+     "basis": "known",
+     "takeaway": "Positive feedback loops snowball (winner gets stronger); negative loops (catch-up) keep things competitive; use them deliberately."
+    },
+    {
+     "id": "9SLxpCVnrFI",
+     "title": "Analytical Game Design: Core Loops, Compulsion Loops",
+     "channel": "Make School",
+     "views": 10728,
+     "duration": 854,
+     "basis": "inferred",
+     "takeaway": "Lecture contrasting healthy core loops with compulsion loops (reward-anticipation cycles); know which one you're building."
+    },
+    {
+     "id": "Lu-RjxeDpU8",
+     "title": "Idle Games: The Mechanics and Monetization of Self-Playing Games",
+     "channel": null,
+     "views": 0,
+     "duration": 3321,
+     "basis": "inferred",
+     "takeaway": "GDC: idle/incremental games run on exponential growth, prestige/reset loops and offline progress; monetize speed and automation."
+    },
+    {
+     "id": "CjnIt7MHC6U",
+     "title": "What makes an incremental game good?",
+     "channel": "Hevipelle",
+     "views": 141540,
+     "duration": 353,
+     "basis": "inferred",
+     "takeaway": "Good incrementals keep introducing new mechanics/layers as numbers grow, so the game changes, not just the digits."
+    },
+    {
+     "id": "Snc6r4JoppQ",
+     "title": "8 Cool Progression Based Mechanics in Games",
+     "channel": "Game Design Library",
+     "views": 31219,
+     "duration": 621,
+     "basis": "inferred",
+     "takeaway": "Catalogue of creative progression mechanics (unlocks that change how you play) as alternatives to plain stat increases."
+    },
+    {
+     "id": "pSadzRjjQmI",
+     "title": "8 Cool Permanent Progression Mechanics in Games",
+     "channel": "Game Design Library",
+     "views": 43219,
+     "duration": 778,
+     "basis": "inferred",
+     "takeaway": "Permanent (meta) progression mechanics that carry across runs/resets, keeping repeat play meaningful."
+    },
+    {
+     "id": "Zc3QxppHlnA",
+     "title": "How Great Games Do Progression | A Stardew Valley Video Essay",
+     "channel": "James Likes Games",
+     "views": 13606,
+     "duration": 502,
+     "basis": "inferred",
+     "takeaway": "Stardew Valley: daily short-term goals feed seasonal/long-term goals; every session ends with progress made."
+    },
+    {
+     "id": "IgsmXuXSl_s",
+     "title": "Making a Tycoon in 2025 Pt.6 | Side Loops!",
+     "channel": "RoBuilder",
+     "views": 7117,
+     "duration": 667,
+     "basis": "inferred",
+     "takeaway": "Tycoon devlog: add side loops (mini-activities, collectibles, quests) around the main income loop to add variety and session time."
+    },
+    {
+     "id": "t2oQsu9DKhQ",
+     "title": "I Made a Roblox Simulator Game in 7 Days!",
+     "channel": "Maze Sunshine",
+     "views": 395109,
+     "duration": 460,
+     "basis": "inferred",
+     "takeaway": "Building a Roblox simulator in 7 days: click/collect → sell → upgrade → new zone; rebirths reset for multipliers."
+    },
+    {
+     "id": "MIMMJ4xHYR8",
+     "title": "Go from Ideas to Gameplay using Gameplay Loops",
+     "channel": "Game Design with Michael",
+     "views": 36531,
+     "duration": 332,
+     "basis": "inferred",
+     "takeaway": "Turn an idea into gameplay by writing its loop first: what the player does repeatedly, why, and what changes over time."
+    }
+   ]
+  },
+  "ui-design": {
+   "name": "UI Design",
+   "videos": [
+    {
+     "id": "F6AtQKo3uIY",
+     "title": "Make Your Roblox UI Look 10x Better",
+     "channel": "Develuper",
+     "views": 169878,
+     "duration": 423,
+     "basis": "inferred",
+     "takeaway": "Fast UI upgrades: consistent palette, rounded corners, strokes, gradients, drop shadows and clear hierarchy make Roblox UI look professional."
+    },
+    {
+     "id": "ZTzUHfMeYKA",
+     "title": "Making Good UI is EASY, People Are Just Lazy",
+     "channel": "ByteBlox",
+     "views": 177127,
+     "duration": 1049,
+     "basis": "inferred",
+     "takeaway": "Good UI is mostly discipline: consistent spacing, alignment, readable fonts and a limited palette; laziness, not talent, is the gap."
+    },
+    {
+     "id": "Ezk3vEOvv8o",
+     "title": "How Modern Roblox UI Actually Works",
+     "channel": "Leif",
+     "views": 185001,
+     "duration": 896,
+     "basis": "inferred",
+     "takeaway": "Modern pro Roblox UI is built with React-Luau (component-based, state-driven) for maintainability in larger games."
+    },
+    {
+     "id": "z16zs2v-FNI",
+     "title": "The Greatest Cartoony UI Tutorial on Roblox (w/ Figma)",
+     "channel": "Kek",
+     "views": 98009,
+     "duration": 2514,
+     "basis": "inferred",
+     "takeaway": "Design cartoony Roblox UI in Figma first (thick outlines, bold colors, chunky buttons), then import to Studio."
+    },
+    {
+     "id": "gnIKtS3nUqo",
+     "title": "The Greatest Stud UI Tutorial on Roblox (w/ Figma)",
+     "channel": "Kek",
+     "views": 74772,
+     "duration": 3711,
+     "basis": "inferred",
+     "takeaway": "Stud-style UI (Roblox-native chunky 3D look) workflow in Figma; matches the visual language many top games use."
+    },
+    {
+     "id": "lmNWskz9cEI",
+     "title": "The Ultimate Beginner’s Guide to Roblox GUI",
+     "channel": "Kek",
+     "views": 150571,
+     "duration": 1096,
+     "basis": "inferred",
+     "takeaway": "Beginner GUI fundamentals: ScreenGui, Frames, Scale vs Offset, layouts (UIListLayout/UIGridLayout), anchoring."
+    },
+    {
+     "id": "RPqIm0I_gsw",
+     "title": "How To Improve Your UI In Roblox Studio",
+     "channel": "Kingkade 3D",
+     "views": 47324,
+     "duration": 704,
+     "basis": "inferred",
+     "takeaway": "Improve existing UI step by step: reduce clutter, add icons, use consistent button styles, improve contrast."
+    },
+    {
+     "id": "1B46XsUvi2E",
+     "title": "How To Scale UI Across Devices In Roblox Studio",
+     "channel": "Kingkade 3D",
+     "views": 38856,
+     "duration": 276,
+     "basis": "inferred",
+     "takeaway": "Scale UI across phones, tablets and PC: use Scale sizing, UIAspectRatioConstraint, anchor points, and test on device emulators."
+    },
+    {
+     "id": "2z4rebjBnQA",
+     "title": "Make Your Roblox UI Buttons SUPER Smooth in 8 Minutes!",
+     "channel": "PineappleDev",
+     "views": 138106,
+     "duration": 515,
+     "basis": "inferred",
+     "takeaway": "Smooth button feedback with TweenService: hover/press scale, color shift, and sound make buttons feel responsive."
+    },
+    {
+     "id": "8pJGBz-J75w",
+     "title": "Make Your UI Feel 10x Times Better With ANIMATIONS",
+     "channel": "Develuper",
+     "views": 56933,
+     "duration": 419,
+     "basis": "inferred",
+     "takeaway": "Animate UI (open/close transitions, hover states, bounces) so the interface feels alive and responsive."
+    },
+    {
+     "id": "p_T0V9Lg2Ns",
+     "title": "How To Add Effects To UI In Roblox Studio",
+     "channel": "gfxcomet",
+     "views": 139825,
+     "duration": 687,
+     "basis": "inferred",
+     "takeaway": "Add effects to UI (gradients animating, shine sweeps, particles) to draw attention to important buttons like the shop."
+    },
+    {
+     "id": "FK3kBKCn6s8",
+     "title": "Roblox UI Design Basics for Beginners",
+     "channel": "gfxcomet",
+     "views": 15690,
+     "duration": 370,
+     "basis": "inferred",
+     "takeaway": "UI design basics for Roblox: hierarchy, contrast, consistency, and leaving breathing room."
+    },
+    {
+     "id": "gfEGk5rgdwc",
+     "title": "i hate modern game user interfaces",
+     "channel": "Stryxo",
+     "views": 1291591,
+     "duration": 860,
+     "basis": "known",
+     "takeaway": "Critique of modern game UIs: cluttered HUDs, menus nested too deep, and style over readability hurt the experience."
+    },
+    {
+     "id": "KIvLywqLCW0",
+     "title": "The Power of Font In Video Games",
+     "channel": "Juniper Dev",
+     "views": 899326,
+     "duration": 909,
+     "basis": "known",
+     "takeaway": "Fonts carry tone and readability; pick a font that fits the game's mood and stays legible at small sizes."
+    },
+    {
+     "id": "IG5BIAaBwdE",
+     "title": "The Psychology of Color In Video Games",
+     "channel": "Juniper Dev",
+     "views": 215985,
+     "duration": 818,
+     "basis": "known",
+     "takeaway": "Color psychology: use color consistently to signal meaning (rarity, danger, reward) and set emotional tone."
+    },
+    {
+     "id": "-auyB19Mc6U",
+     "title": "Diegetic UI - Realistic, or Distracting? - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 269062,
+     "duration": 474,
+     "basis": "known",
+     "takeaway": "Diegetic (in-world) UI can increase immersion but must stay readable; mix diegetic and screen UI pragmatically."
+    },
+    {
+     "id": "1PTkJTJE_Kc",
+     "title": "10 Video Games With The BEST UI Design",
+     "channel": "MojoPlays",
+     "views": 54100,
+     "duration": 607,
+     "basis": "inferred",
+     "takeaway": "Examples of games with great UI: strong style identity, clarity under pressure, and smooth navigation."
+    },
+    {
+     "id": "YJmbKrL_BUY",
+     "title": "Game UI Design - How to design mobile game UI | BOOM QUEST E01 #gameart",
+     "channel": "Rushan Sanjana",
+     "views": 6034,
+     "duration": 431,
+     "basis": "inferred",
+     "takeaway": "Mobile game UI workflow: big thumb-friendly buttons, bright readable icons, and layouts designed for the screen edges."
+    },
+    {
+     "id": "sVswlWdfqTs",
+     "title": "How To Create Mobile Game UI Screen in Figma, Battlepass / Goldenpass Screen",
+     "channel": "Game UI Design",
+     "views": 26042,
+     "duration": 1506,
+     "basis": "inferred",
+     "takeaway": "Designing a battle/season pass screen: clear tier track, free vs premium rows, and previewed rewards."
+    },
+    {
+     "id": "u404sKevMPU",
+     "title": "How to make Animated Opening Shop Gui in Roblox (2024)",
+     "channel": "Rileybytes",
+     "views": 132312,
+     "duration": 520,
+     "basis": "inferred",
+     "takeaway": "Animated shop GUI in Roblox: open animation, item cards, and purchase buttons that feel rewarding."
+    }
+   ]
+  },
+  "monetization": {
+   "name": "Monetization",
+   "videos": [
+    {
+     "id": "hoMbv_R8AMU",
+     "title": "Mastering Monetization: Lessons from Top Creators | RDC 2026",
+     "channel": "Roblox",
+     "views": 8412,
+     "duration": 1823,
+     "basis": "inferred",
+     "takeaway": "Official RDC 2026 session with top creators' monetization lessons; layered products (passes, dev products, subscriptions) tied to gameplay value."
+    },
+    {
+     "id": "zW0VdnOqxMk",
+     "title": "Here's how I made 2.3M Robux in 3 days of work",
+     "channel": "waveshine",
+     "views": 1507933,
+     "duration": 241,
+     "basis": "inferred",
+     "takeaway": "The two easiest ways the creator found to earn Robux on Roblox, framed against low-effort tutorials; focus on proven product types."
+    },
+    {
+     "id": "LZOohZHsJus",
+     "title": "My Roblox Game Makes $119,300/mo (38K CCU, here's how)",
+     "channel": "Tizzy RBLX",
+     "views": 383410,
+     "duration": 1383,
+     "basis": "inferred",
+     "takeaway": "Breakdown of a 38K-CCU game's strategy and products; revenue comes from retention and many purchase pathways, not one product."
+    },
+    {
+     "id": "KoGT6LokHBE",
+     "title": "How My 100 Player AI Roblox Game Made 2,000,000 Robux (NO BULLSH*T)",
+     "channel": "Tap",
+     "views": 194425,
+     "duration": 1446,
+     "basis": "inferred",
+     "takeaway": "A 100-CCU game earned ~2M Robux: game passes and dev products that sold, and why retention/monetization depth beats raw CCU."
+    },
+    {
+     "id": "wKI3PBO3bB0",
+     "title": "How I made 23M ROBUX this year as a small roblox developer (5M Visits)",
+     "channel": "BruceDevs",
+     "views": 150129,
+     "duration": 1031,
+     "basis": "inferred",
+     "takeaway": "Small developer's year earning 23M Robux across games: many smaller titles, data-driven iteration, and focused products."
+    },
+    {
+     "id": "zoz3PSMqets",
+     "title": "Roblox Game Monetization Explained Like You're 5",
+     "channel": "Tizzy RBLX",
+     "views": 32400,
+     "duration": 908,
+     "basis": "inferred",
+     "takeaway": "Monetization basics: game passes (one-time perks), developer products (repeatable), Premium payouts, and how to price them."
+    },
+    {
+     "id": "5uXLixtTgJM",
+     "title": "Top 5 Ways to MONETIZE Your Roblox Game!",
+     "channel": "RoBuilder",
+     "views": 44344,
+     "duration": 516,
+     "basis": "inferred",
+     "takeaway": "Top monetization methods for Roblox games: passes, dev products, VIP/private servers, cosmetics, and limited-time offers."
+    },
+    {
+     "id": "-PoyiiGhoNo",
+     "title": "My Roblox Game Made $43,292 (Here's Exactly How to Monetize Yours)",
+     "channel": "MoseyTube77",
+     "views": 34616,
+     "duration": 365,
+     "basis": "inferred",
+     "takeaway": "Which developer products sold most in a $43K game and why: products that solve a pain at the moment players feel it."
+    },
+    {
+     "id": "r_p3iqil94Q",
+     "title": "How to MONETIZE your ROBLOX GAME to EARN ROBUX",
+     "channel": "Abstro",
+     "views": 54347,
+     "duration": 527,
+     "basis": "inferred",
+     "takeaway": "How to add monetization to your game: placement of shop/purchase prompts and the types of items that sell."
+    },
+    {
+     "id": "k4j5DsbQnHM",
+     "title": "Every Roblox Monetization Strategy Explained in 5 Minutes",
+     "channel": "Wyrq",
+     "views": 2095,
+     "duration": 313,
+     "basis": "inferred",
+     "takeaway": "Eight psychological 'traps' behind Roblox spending (scarcity, anchoring, sunk cost...) - know them to use ethically or avoid."
+    },
+    {
+     "id": "n29WMYNTZHs",
+     "title": "Developer Products (Repeated Robux Pass) - Roblox Advanced Scripting #22",
+     "channel": "BrawlDev",
+     "views": 64485,
+     "duration": 1852,
+     "basis": "inferred",
+     "takeaway": "Scripting developer products correctly: ProcessReceipt, idempotent server-side granting, saving purchases."
+    },
+    {
+     "id": "8FIj3gmP5Ls",
+     "title": "Sell Developer Products EASILY with ProfileStore (Roblox Tutorial)",
+     "channel": "Rileybytes",
+     "views": 20623,
+     "duration": 2294,
+     "basis": "inferred",
+     "takeaway": "Selling developer products with ProfileStore so purchases are granted once and persist safely."
+    },
+    {
+     "id": "xNjI03CGkb4",
+     "title": "Let’s go whaling: Tricks for monetising mobile game players with free-to-play",
+     "channel": null,
+     "views": 0,
+     "duration": 1189,
+     "basis": "known",
+     "takeaway": "F2P 'whale' monetization tricks explained; a cautionary look at manipulative designs and their reputational cost."
+    },
+    {
+     "id": "8xgnm6SynH4",
+     "title": "I Spent 24 Hours With Roblox Millionaires",
+     "channel": "Starter Story",
+     "views": 4405944,
+     "duration": 1231,
+     "basis": "inferred",
+     "takeaway": "Day with Roblox millionaire devs: teams treat games as businesses - data, updates, ads, and monetization tuning."
+    },
+    {
+     "id": "ZradA-cygP0",
+     "title": "How much my 2k+ CCU Roblox game makes",
+     "channel": "Kradez",
+     "views": 30365,
+     "duration": 686,
+     "basis": "inferred",
+     "takeaway": "Real earnings of a 2k+ CCU game; shows revenue per CCU varies hugely with monetization design."
+    },
+    {
+     "id": "2Q4NqQikzsY",
+     "title": "How Much Money Does a Roblox Game Actually Make?",
+     "channel": "VuukStudios",
+     "views": 32669,
+     "duration": 919,
+     "basis": "inferred",
+     "takeaway": "Realistic earnings ranges for Roblox games and what separates well- from poorly-monetized games."
+    },
+    {
+     "id": "hxjumUFspP0",
+     "title": "How Much Money Roblox Developers Make?",
+     "channel": "janisjanis01",
+     "views": 182604,
+     "duration": 516,
+     "basis": "inferred",
+     "takeaway": "How much Roblox developers actually make: a few hits earn most; most games earn little - plan for many attempts."
+    },
+    {
+     "id": "SUMTYryynss",
+     "title": "Converting $11,592,856 Robux to REAL LIFE MONEY As a Small Developer (Roblox DevEx)",
+     "channel": "Kyblox",
+     "views": 1089889,
+     "duration": 279,
+     "basis": "inferred",
+     "takeaway": "DevEx walkthrough: converting earned Robux to real money, rates and requirements."
+    },
+    {
+     "id": "K-4fRBnN2Ek",
+     "title": "How I Made $14M Robux in 1 WEEK",
+     "channel": "Laughability",
+     "views": 6657745,
+     "duration": 3111,
+     "basis": "inferred",
+     "takeaway": "Story of a game earning ~14M Robux in one week; how a viral spike plus ready monetization captured revenue."
+    },
+    {
+     "id": "LD7LGP10dRc",
+     "title": "How Much Money I Made With 3 Roblox Games",
+     "channel": "MonarchDev",
+     "views": 45286,
+     "duration": 362,
+     "basis": "inferred",
+     "takeaway": "Small-scale reality check: three games, $130 of ads, ~9k visits - read straight from the dashboard."
+    }
+   ]
+  },
+  "fun": {
+   "name": "What Makes a Game Fun (feel, pacing, risk/reward, novelty, social)",
+   "videos": [
+    {
+     "id": "216_5nu4aVQ",
+     "title": "Secrets of Game Feel and Juice",
+     "channel": "Game Maker's Toolkit",
+     "views": 1126420,
+     "duration": 319,
+     "basis": "known",
+     "takeaway": "Game feel = responsive controls + layered feedback (animation, particles, sound, screen shake, hit-pause); tune it until actions feel good on their own."
+    },
+    {
+     "id": "Fy0aCDmgnxg",
+     "title": "Juice it or lose it - a talk by Martin Jonasson & Petri Purho",
+     "channel": "grapefrukt",
+     "views": 619386,
+     "duration": 938,
+     "basis": "known",
+     "takeaway": "'Juice it or lose it': the same game transformed by tweening, squash/stretch, particles, sound and shake - juice multiplies satisfaction cheaply."
+    },
+    {
+     "id": "AJdEqssNZ-U",
+     "title": "Jan Willem Nijman - Vlambeer - \"The art of screenshake\" at INDIGO Classes 2013",
+     "channel": "Dutch Game Garden",
+     "views": 387188,
+     "duration": 2650,
+     "basis": "known",
+     "takeaway": "Vlambeer's ~30 feel tricks: screen shake, hit-stop, big bullets/impacts, recoil/knockback, permanence (debris stays), sound punch."
+    },
+    {
+     "id": "7L1B5YaxxoA",
+     "title": "Can We Make This Button Fun To Press?",
+     "channel": "Jonas Tyroller",
+     "views": 964540,
+     "duration": 457,
+     "basis": "known",
+     "takeaway": "Even a single button press becomes fun with anticipation, squash, particles, sound and reaction - feedback design matters more than content."
+    },
+    {
+     "id": "plj09H-aLOk",
+     "title": "How to make your game 2X as fun! - (In No Time.)",
+     "channel": "Jonas Tyroller",
+     "views": 343546,
+     "duration": 371,
+     "basis": "known",
+     "takeaway": "Quick wins for fun: tighten feedback, add variety and surprise, reduce downtime and frustration."
+    },
+    {
+     "id": "qCj9CZoAvFY",
+     "title": "10 Ways to Improve Game Feel",
+     "channel": "Design Diary",
+     "views": 87315,
+     "duration": 637,
+     "basis": "inferred",
+     "takeaway": "Ten concrete game-feel improvements: input buffering, coyote time, easing, camera work, impact frames, audio layering."
+    },
+    {
+     "id": "dwI5b-wRLic",
+     "title": "The Two Types of Random in Game Design",
+     "channel": "Game Maker's Toolkit",
+     "views": 3632752,
+     "duration": 1158,
+     "basis": "known",
+     "takeaway": "Input randomness (before the player acts) creates interesting decisions; output randomness (after) can feel unfair - choose deliberately."
+    },
+    {
+     "id": "1ypOUn6rThM",
+     "title": "This Psychological Trick Makes Rewards Backfire",
+     "channel": "Game Maker's Toolkit",
+     "views": 1274563,
+     "duration": 687,
+     "basis": "known",
+     "takeaway": "Overjustification effect: heavy extrinsic rewards can make an intrinsically fun activity feel like a chore."
+    },
+    {
+     "id": "iIOIT3dCy5w",
+     "title": "How To Think Like A Game Designer",
+     "channel": "Game Maker's Toolkit",
+     "views": 994259,
+     "duration": 787,
+     "basis": "known",
+     "takeaway": "Think like a designer: start from the experience/feeling you want, then design mechanics that produce it."
+    },
+    {
+     "id": "FXqEykD5Ub4",
+     "title": "Risk and Reward  [Game Essence]",
+     "channel": "Masahiro Sakurai on Creating Games",
+     "views": 352278,
+     "duration": 600,
+     "basis": "known",
+     "takeaway": "Sakurai: risk and reward should scale together; letting players choose bigger risk for bigger payoff creates tension and excitement."
+    },
+    {
+     "id": "OdVkEOzdCPw",
+     "title": "Stop for Big Moments! [Design Specifics]",
+     "channel": "Masahiro Sakurai on Creating Games",
+     "views": 503505,
+     "duration": 259,
+     "basis": "known",
+     "takeaway": "Sakurai: briefly pause (hit-stop/slow-mo) on big moments so players register and savor them."
+    },
+    {
+     "id": "TYh5SJb5gWk",
+     "title": "Squeeze and Release [Game Essence]",
+     "channel": "Masahiro Sakurai on Creating Games",
+     "views": 205289,
+     "duration": 160,
+     "basis": "known",
+     "takeaway": "Sakurai: alternate tension (squeeze) and release; relief after pressure is what makes peaks feel good."
+    },
+    {
+     "id": "5LScL4CWe5E",
+     "title": "Pacing - How Games Keep Things Exciting - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 395397,
+     "duration": 386,
+     "basis": "known",
+     "takeaway": "Pacing: vary intensity like a wave - build-up, peak, rest - to avoid fatigue and boredom."
+    },
+    {
+     "id": "ftiHgyFt72M",
+     "title": "Keeping players Interested - Pacing in Game Design",
+     "channel": "Brackeys",
+     "views": 141445,
+     "duration": 697,
+     "basis": "known",
+     "takeaway": "Keep players interested through pacing: introduce new mechanics/challenges regularly and give breathers between peaks."
+    },
+    {
+     "id": "2QJVGtKPjNc",
+     "title": "Non-Combat Gaming - How to Make Social Mechanics Fun - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 793142,
+     "duration": 411,
+     "basis": "known",
+     "takeaway": "Social mechanics are fun when players can cooperate, show off, and affect each other in meaningful but non-griefing ways."
+    },
+    {
+     "id": "h86g-XgUCA8",
+     "title": "Intrinsic vs Extrinsic - Designing Good Rewards in Games - Extra Credits",
+     "channel": "Extra Credits",
+     "views": 439387,
+     "duration": 348,
+     "basis": "known",
+     "takeaway": "Intrinsic rewards (mastery, curiosity, expression) outlast extrinsic ones; use extrinsic rewards to point at intrinsic fun."
+    },
+    {
+     "id": "WggIdtrqgKg",
+     "title": "Sid Meier's Interesting Decisions",
+     "channel": "GDC Festival of Gaming",
+     "views": 69011,
+     "duration": 3644,
+     "basis": "known",
+     "takeaway": "Sid Meier: a game is a series of interesting decisions - trade-offs with no single obvious answer, made with enough information."
+    },
+    {
+     "id": "lkatr_a1OMQ",
+     "title": "What Makes Games FUN (Psychology in Gaming)",
+     "channel": "My GameDev Pal",
+     "views": 270435,
+     "duration": 421,
+     "basis": "inferred",
+     "takeaway": "Psychology of fun: competence, autonomy, relatedness (self-determination theory), plus flow from balanced challenge."
+    },
+    {
+     "id": "78rPt0RsosQ",
+     "title": "WIRED by Design: A Game Designer Explains the Counterintuitive Secret to Fun",
+     "channel": "WIRED",
+     "views": 356510,
+     "duration": 643,
+     "basis": "inferred",
+     "takeaway": "A designer's counterintuitive secret to fun: constraints and friction, used well, create challenge and meaning."
+    },
+    {
+     "id": "MYJBRWT7JGU",
+     "title": "Psychology of Gaming: Crash Course Games #16",
+     "channel": "CrashCourse",
+     "views": 278530,
+     "duration": 527,
+     "basis": "known",
+     "takeaway": "Crash Course on gaming psychology: flow, rewards, learning curves, and why mastery feels good."
+    }
+   ]
+  }
+ }
+}

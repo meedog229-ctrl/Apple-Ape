@@ -1,0 +1,758 @@
+{
+ "extra_metadata": {
+  "hoMbv_R8AMU": {
+   "title": "Mastering Monetization: Lessons from Top Creators | RDC 2026",
+   "channel": "Roblox",
+   "views": 8412,
+   "duration": 1823
+  },
+  "XfxbdKtSbOI": {
+   "title": "Onboarding Essentials",
+   "channel": "Roblox Creators",
+   "views": 5553,
+   "duration": 732
+  },
+  "TZ14iO23Bpk": {
+   "title": "RDC 22: Creating an Intriguing First Time User Experience - Onett (Bee Swarm Simulator)",
+   "channel": "Onett",
+   "views": 407315,
+   "duration": 1657
+  },
+  "AJdEqssNZ-U": {
+   "title": "Jan Willem Nijman - Vlambeer - \"The art of screenshake\" at INDIGO Classes 2013",
+   "channel": "Dutch Game Garden",
+   "views": 387188,
+   "duration": 2650
+  },
+  "WggIdtrqgKg": {
+   "title": "Sid Meier's Interesting Decisions",
+   "channel": "GDC Festival of Gaming",
+   "views": 69011,
+   "duration": 3644
+  },
+  "Xz53DEwuAcU": {
+   "title": "Making Tutorials Feel Natural [Planning & Game Design]",
+   "channel": "Masahiro Sakurai on Creating Games",
+   "views": 53838,
+   "duration": 178
+  },
+  "R7rd4-ua2AI": {
+   "title": "Being Kind to Beginners [Planning & Game Design]",
+   "channel": "Masahiro Sakurai on Creating Games",
+   "views": 43881,
+   "duration": 179
+  },
+  "OdVkEOzdCPw": {
+   "title": "Stop for Big Moments! [Design Specifics]",
+   "channel": "Masahiro Sakurai on Creating Games",
+   "views": 503505,
+   "duration": 259
+  },
+  "TYh5SJb5gWk": {
+   "title": "Squeeze and Release [Game Essence]",
+   "channel": "Masahiro Sakurai on Creating Games",
+   "views": 205289,
+   "duration": 160
+  },
+  "u_8p65Bsm2Y": {
+   "title": "How to Boost your Game using Roblox Funnel Analytics",
+   "channel": "GnomeCode",
+   "views": 20383,
+   "duration": 476
+  },
+  "t2oQsu9DKhQ": {
+   "title": "I Made a Roblox Simulator Game in 7 Days!",
+   "channel": "Maze Sunshine",
+   "views": 395109,
+   "duration": 460
+  }
+ },
+ "categories": {
+  "roblox-dev": {
+   "file": "01-roblox-dev-and-game-design.md",
+   "name": "Roblox Development & Game Design",
+   "videos": [
+    [
+     "Le4QhC3dDGk",
+     "inferred",
+     "Popularity is designed, not lucky: pick a proven genre, make the first minutes clear and rewarding, and plan updates before launch."
+    ],
+    [
+     "Y93DRfB-Deo",
+     "inferred",
+     "Games that blow up pair a simple, instantly-readable hook with retention and shareable moments; the algorithm amplifies stats, not effort."
+    ],
+    [
+     "xnlaYLnCtFc",
+     "inferred",
+     "Realistic dev journey: most first games flop; ship small, learn from data, and treat each release as practice for the next."
+    ],
+    [
+     "N2FND74tgGE",
+     "inferred",
+     "Study top games in your genre before building: copy the proven structure (loop, UI, progression), differentiate on theme."
+    ],
+    [
+     "kg_h09_x7no",
+     "inferred",
+     "Viral games are usually simple ideas executed fast with a strong thumbnail/title; scope small and iterate."
+    ],
+    [
+     "4-ge-E9WvM4",
+     "inferred",
+     "Postmortem of a 30-day front-page game: tight scope, quick launch, ads to seed data, then rapid updates driven by stats."
+    ],
+    [
+     "rdWyuDEpGyk",
+     "inferred",
+     "Growth do's/don'ts: update consistently, fix stats one at a time, don't clickbait thumbnails, don't over-monetize early."
+    ],
+    [
+     "f63stwpsaXw",
+     "inferred",
+     "Costly mistakes: overscoping, launching without analytics, ignoring mobile, spending ads on an unfixed game, weak thumbnails."
+    ],
+    [
+     "vemqKJ-5yRE",
+     "inferred",
+     "Long-form primer on what to know before building: genre choice, scope, the stats the algorithm reads, and planning monetization from day one."
+    ],
+    [
+     "hUk567j6CLo",
+     "inferred",
+     "Trying to make 'the best game ever' first produced an unfocused mess; small, focused scope beats ambition on a first game."
+    ],
+    [
+     "RIWPfMJyVhQ",
+     "inferred",
+     "Repeatable process (not luck): validate idea, build core loop fast, launch with ads, iterate on retention/playtime."
+    ],
+    [
+     "315hkxjTBZc",
+     "inferred",
+     "Devs quit from burnout and unrealistic expectations; ship many small games and treat failures as data."
+    ],
+    [
+     "fjlOaEALWmg",
+     "inferred",
+     "Viral game case study: strong hook + polished thumbnails/icon/UI art; presentation quality drives click-through."
+    ],
+    [
+     "ASr_I6inrzI",
+     "inferred",
+     "Comedic but accurate stages of Roblox dev (idea hype, scope creep, bugs, launch reality); plan for the unglamorous middle."
+    ],
+    [
+     "eRhFPgj8tc4",
+     "inferred",
+     "A viral game died because it lacked depth/updates; the sequel focused on longer-term progression and content cadence."
+    ],
+    [
+     "CRCcsYEB_6A",
+     "inferred",
+     "The '80/20 formula': ~80% proven mechanics players already understand, ~20% fresh twist/theme."
+    ],
+    [
+     "0rMO-VHSuGs",
+     "inferred",
+     "Common dev mistakes: no prototyping, polishing before fun is proven, building systems nobody uses, not playtesting with strangers."
+    ],
+    [
+     "7z8rfg_jBuk",
+     "inferred",
+     "Advertise correctly: test many thumbnails, small steady sponsor budgets, judge after several days, and fix the game before scaling spend."
+    ],
+    [
+     "u_8p65Bsm2Y",
+     "inferred",
+     "Use Roblox Funnel analytics: log each onboarding/core-loop step, find the biggest drop-off, fix that single step, repeat."
+    ],
+    [
+     "gc7K98RlOik",
+     "inferred",
+     "Fun comes from clear goals + constant feedback + meaningful progress; test the core action in isolation before adding systems."
+    ]
+   ],
+   "patterns": [
+    "**Scope small, ship fast, iterate on data.** Nearly every success story is a tightly-scoped game launched in days/weeks, then improved weekly using stats.",
+    "**80% proven / 20% novel.** Reuse genre conventions players already understand (loops, UI layout, progression); spend novelty on theme and one twist.",
+    "**Stats drive the algorithm.** Session length, D1/D7 retention, play-through rate and monetization are what Home recommendations reward; effort or graphics alone don't.",
+    "**Packaging is half the game.** Thumbnails, icon and title determine whether anyone tries the game; test many variants.",
+    "**First games fail; that's the curriculum.** Creators frame flops as practice and recommend many small releases over one giant project.",
+    "**Instrument from day one.** Funnels on onboarding and the core loop are the fastest way to find what's broken."
+   ]
+  },
+  "retention": {
+   "file": "02-player-retention.md",
+   "name": "Player Retention",
+   "videos": [
+    [
+     "hbzGO_Qonu0",
+     "known",
+     "Ethical engagement: keep players through intrinsic motivation (mastery, curiosity, autonomy) instead of compulsion tricks; respect players' time and let them stop."
+    ],
+    [
+     "7L8vAGGitr8",
+     "known",
+     "Players will optimize the fun out of a game; designers must shape incentives so the optimal strategy is also the fun one."
+    ],
+    [
+     "LpAU6TheAZ4",
+     "inferred",
+     "Official explainer of D1/D7/D30 retention on the Creator Dashboard and why it's a key quality signal for recommendations."
+    ],
+    [
+     "dXqZC4x2Vn8",
+     "inferred",
+     "Official onboarding techniques: get to the fun quickly, teach by doing, use contextual hints, and give an early win."
+    ],
+    [
+     "XfxbdKtSbOI",
+     "inferred",
+     "Roblox's onboarding essentials: fast early levels, starter items/currency, visible short/mid/long goals, a designed 'moment of joy', funnel each step."
+    ],
+    [
+     "TZ14iO23Bpk",
+     "inferred",
+     "Bee Swarm Simulator's creator on FTUE: intrigue new players with an inviting world and immediate progress, then reveal depth gradually."
+    ],
+    [
+     "HFcegpPPvpI",
+     "inferred",
+     "Read your stats as a diagnosis: low playtime = weak loop, low D1 = weak FTUE/hook, low D7 = weak progression; fix the weakest first."
+    ],
+    [
+     "HxYGLLNczC8",
+     "inferred",
+     "Mobile retention: short sessions with clear goals, daily reasons to return, progression that's always visible."
+    ],
+    [
+     "k2HrRSWHYJc",
+     "known",
+     "Returning after a break is hard (forgotten controls/goals); 'welcome back' recaps and gentle re-onboarding reduce lapsed-player churn."
+    ],
+    [
+     "GHEBkhT1K7A",
+     "inferred",
+     "Path of Exile keeps players returning with regular content leagues (fresh starts), deep build mastery, and fair monetization."
+    ],
+    [
+     "_Hjm9LLSICg",
+     "inferred",
+     "GDC: move retention design from rational hooks (rewards) to emotional ones (attachment, identity, social belonging)."
+    ],
+    [
+     "tSyt0alpoyg",
+     "inferred",
+     "GDC: time-based systems (timers, energy, daily cycles) structure F2P sessions; use them to create appointments, not walls."
+    ],
+    [
+     "gPV0qmyGs-o",
+     "inferred",
+     "GDC: narrative and character attachment give players emotional reasons to come back beyond rewards."
+    ],
+    [
+     "Qsq-Sj_rojU",
+     "inferred",
+     "Study of 1,460 app onboarding flows: fewer steps, value shown before asks, progressive disclosure, personalization."
+    ],
+    [
+     "FE7lDFAcb4Y",
+     "known",
+     "Four kinds of exploration (spatial, mechanical, narrative, social) each create curiosity; layered secrets reward continued play."
+    ],
+    [
+     "K0M1PuQaE8s",
+     "inferred",
+     "Catalogue of compulsion techniques (variable rewards, loss aversion, sunk cost) - useful as a list of dark patterns to avoid or use carefully."
+    ],
+    [
+     "Xz53DEwuAcU",
+     "known",
+     "Tutorials should feel like play: teach inside the real game with natural prompts, not walls of text."
+    ],
+    [
+     "R7rd4-ua2AI",
+     "known",
+     "Be kind to beginners: lower early difficulty, give generous early wins, let experts skip ahead."
+    ],
+    [
+     "fPT2GCkK1QM",
+     "inferred",
+     "Small-game growth: tighten the first session, update often, and use stats (not gut feeling) to pick what to fix next."
+    ],
+    [
+     "KtWaBC-bW7E",
+     "inferred",
+     "Recent algorithm changes weight long-term behavior (retention, returning players, friend invites) over launch-day spikes."
+    ]
+   ],
+   "patterns": [
+    "**Fun in the first minute, payoff within five.** Every source stresses an immediate first action, an early win, and a visible next goal; Roblox's own guidance targets reaching the fun within ~5 minutes.",
+    "**Teach by doing.** Short contextual prompts (arrows, beams, highlights) beat text tutorials; funnel every tutorial step and fix the worst one.",
+    "**Give a concrete reason to return tomorrow.** Something growing/finishing while away, an escalating daily reward, a friend's progress - tied to the real goal, not just free currency.",
+    "**D1 = onboarding, D7 = progression, D30 = content and social.** Diagnose retention by phase instead of adding daily rewards everywhere.",
+    "**Emotional > rational hooks.** Attachment (pets, bases, identity), mastery and social belonging hold players longer than reward schedules alone.",
+    "**Avoid compulsion traps.** Loss aversion, sunk-cost pressure and punishing absence raise short-term numbers but damage trust; respect stopping points."
+   ]
+  },
+  "gameplay-loops": {
+   "file": "03-gameplay-loops.md",
+   "name": "Gameplay Loops",
+   "videos": [
+    [
+     "Sk-nbAtIUko",
+     "known",
+     "Loops nest: moment-to-moment action, a session loop of goals, and a long-term loop of progression; each layer must be satisfying on its own."
+    ],
+    [
+     "wTbSrOexWZU",
+     "inferred",
+     "Design a loop as action → reward → upgrade → harder/better action, and make sure each step is clear to the player."
+    ],
+    [
+     "S5camMoNw-o",
+     "known",
+     "Good progression unlocks new ways to play (variety, options), not just bigger numbers; pure stat treadmills feel like Skinner boxes."
+    ],
+    [
+     "aDE69s3pp7M",
+     "known",
+     "Timothy Cain (Fallout co-creator): define the core loop early, keep it simple, and test that the repeated action is enjoyable before content."
+    ],
+    [
+     "PMj8Q4ViKzs",
+     "inferred",
+     "Explains loop terminology (core, meta, feedback loops) with examples; useful vocabulary for designing and documenting loops."
+    ],
+    [
+     "Zrf1cou_yVo",
+     "known",
+     "Game economies need balanced faucets (sources) and drains (sinks); unchecked inflation trivializes rewards."
+    ],
+    [
+     "gDQX3jk5xxc",
+     "known",
+     "Progression systems should give players choices and expression; the anticipation of the next unlock is itself the reward."
+    ],
+    [
+     "6SYX17NzNqE",
+     "known",
+     "'Chains' instead of loops: think of play as a sequence of goals that evolve and lead somewhere, not a circle that repeats unchanged."
+    ],
+    [
+     "Ae_zvm0-CQU",
+     "known",
+     "A good level-up system gives noticeable, felt power gains and meaningful choices at each level; invisible +1% upgrades don't motivate."
+    ],
+    [
+     "mGL5YGcAxEI",
+     "known",
+     "The real core loop every game shares: the player forms a goal, acts, gets feedback, and learns; design for that learning cycle."
+    ],
+    [
+     "H4kbJObhcHw",
+     "known",
+     "Positive feedback loops snowball (winner gets stronger); negative loops (catch-up) keep things competitive; use them deliberately."
+    ],
+    [
+     "9SLxpCVnrFI",
+     "inferred",
+     "Lecture contrasting healthy core loops with compulsion loops (reward-anticipation cycles); know which one you're building."
+    ],
+    [
+     "Lu-RjxeDpU8",
+     "inferred",
+     "GDC: idle/incremental games run on exponential growth, prestige/reset loops and offline progress; monetize speed and automation."
+    ],
+    [
+     "CjnIt7MHC6U",
+     "inferred",
+     "Good incrementals keep introducing new mechanics/layers as numbers grow, so the game changes, not just the digits."
+    ],
+    [
+     "Snc6r4JoppQ",
+     "inferred",
+     "Catalogue of creative progression mechanics (unlocks that change how you play) as alternatives to plain stat increases."
+    ],
+    [
+     "pSadzRjjQmI",
+     "inferred",
+     "Permanent (meta) progression mechanics that carry across runs/resets, keeping repeat play meaningful."
+    ],
+    [
+     "Zc3QxppHlnA",
+     "inferred",
+     "Stardew Valley: daily short-term goals feed seasonal/long-term goals; every session ends with progress made."
+    ],
+    [
+     "IgsmXuXSl_s",
+     "inferred",
+     "Tycoon devlog: add side loops (mini-activities, collectibles, quests) around the main income loop to add variety and session time."
+    ],
+    [
+     "t2oQsu9DKhQ",
+     "inferred",
+     "Building a Roblox simulator in 7 days: click/collect → sell → upgrade → new zone; rebirths reset for multipliers."
+    ],
+    [
+     "MIMMJ4xHYR8",
+     "inferred",
+     "Turn an idea into gameplay by writing its loop first: what the player does repeatedly, why, and what changes over time."
+    ]
+   ],
+   "patterns": [
+    "**Three nested loops.** Moment-to-moment action (seconds) → session goals (minutes) → long-term progression (days); each layer needs its own payoff.",
+    "**Write the loop as a sentence:** action → feedback/reward → progression choice → more expressive or harder action. If you can't, the design isn't clear yet.",
+    "**Progression must change play, not just numbers.** New zones, tools, mechanics and abilities beat +X% stat treadmills.",
+    "**Economies need sinks.** Every currency source needs a matching drain (upgrades, rebirths, cosmetics) or inflation kills reward value.",
+    "**Prestige/rebirth loops** let simulator/incremental games extend content cheaply: reset progress for a permanent multiplier and a new layer.",
+    "**Prove the core action is fun first.** Prototype the repeated action in isolation before building content or meta systems."
+   ]
+  },
+  "ui-design": {
+   "file": "04-ui-design.md",
+   "name": "UI Design",
+   "videos": [
+    [
+     "F6AtQKo3uIY",
+     "inferred",
+     "Fast UI upgrades: consistent palette, rounded corners, strokes, gradients, drop shadows and clear hierarchy make Roblox UI look professional."
+    ],
+    [
+     "ZTzUHfMeYKA",
+     "inferred",
+     "Good UI is mostly discipline: consistent spacing, alignment, readable fonts and a limited palette; laziness, not talent, is the gap."
+    ],
+    [
+     "Ezk3vEOvv8o",
+     "inferred",
+     "Modern pro Roblox UI is built with React-Luau (component-based, state-driven) for maintainability in larger games."
+    ],
+    [
+     "z16zs2v-FNI",
+     "inferred",
+     "Design cartoony Roblox UI in Figma first (thick outlines, bold colors, chunky buttons), then import to Studio."
+    ],
+    [
+     "gnIKtS3nUqo",
+     "inferred",
+     "Stud-style UI (Roblox-native chunky 3D look) workflow in Figma; matches the visual language many top games use."
+    ],
+    [
+     "lmNWskz9cEI",
+     "inferred",
+     "Beginner GUI fundamentals: ScreenGui, Frames, Scale vs Offset, layouts (UIListLayout/UIGridLayout), anchoring."
+    ],
+    [
+     "RPqIm0I_gsw",
+     "inferred",
+     "Improve existing UI step by step: reduce clutter, add icons, use consistent button styles, improve contrast."
+    ],
+    [
+     "1B46XsUvi2E",
+     "inferred",
+     "Scale UI across phones, tablets and PC: use Scale sizing, UIAspectRatioConstraint, anchor points, and test on device emulators."
+    ],
+    [
+     "2z4rebjBnQA",
+     "inferred",
+     "Smooth button feedback with TweenService: hover/press scale, color shift, and sound make buttons feel responsive."
+    ],
+    [
+     "8pJGBz-J75w",
+     "inferred",
+     "Animate UI (open/close transitions, hover states, bounces) so the interface feels alive and responsive."
+    ],
+    [
+     "p_T0V9Lg2Ns",
+     "inferred",
+     "Add effects to UI (gradients animating, shine sweeps, particles) to draw attention to important buttons like the shop."
+    ],
+    [
+     "FK3kBKCn6s8",
+     "inferred",
+     "UI design basics for Roblox: hierarchy, contrast, consistency, and leaving breathing room."
+    ],
+    [
+     "gfEGk5rgdwc",
+     "known",
+     "Critique of modern game UIs: cluttered HUDs, menus nested too deep, and style over readability hurt the experience."
+    ],
+    [
+     "KIvLywqLCW0",
+     "known",
+     "Fonts carry tone and readability; pick a font that fits the game's mood and stays legible at small sizes."
+    ],
+    [
+     "IG5BIAaBwdE",
+     "known",
+     "Color psychology: use color consistently to signal meaning (rarity, danger, reward) and set emotional tone."
+    ],
+    [
+     "-auyB19Mc6U",
+     "known",
+     "Diegetic (in-world) UI can increase immersion but must stay readable; mix diegetic and screen UI pragmatically."
+    ],
+    [
+     "1PTkJTJE_Kc",
+     "inferred",
+     "Examples of games with great UI: strong style identity, clarity under pressure, and smooth navigation."
+    ],
+    [
+     "YJmbKrL_BUY",
+     "inferred",
+     "Mobile game UI workflow: big thumb-friendly buttons, bright readable icons, and layouts designed for the screen edges."
+    ],
+    [
+     "sVswlWdfqTs",
+     "inferred",
+     "Designing a battle/season pass screen: clear tier track, free vs premium rows, and previewed rewards."
+    ],
+    [
+     "u404sKevMPU",
+     "inferred",
+     "Animated shop GUI in Roblox: open animation, item cards, and purchase buttons that feel rewarding."
+    ]
+   ],
+   "patterns": [
+    "**Mobile-first sizing.** Most Roblox players are on phones: Scale-based layouts, aspect-ratio constraints, safe areas, and thumb-sized buttons (≥ ~44px).",
+    "**Consistency beats decoration.** One palette, one button style, consistent spacing and icons do more than individual flashy elements.",
+    "**Every button reacts.** Hover/press tweens + a click sound are the cheapest polish with the biggest feel improvement.",
+    "**Design in Figma, build in Studio.** Pros mock up screens first, then import; stud/cartoony styles fit Roblox's visual language.",
+    "**Color and type carry meaning.** Use color to encode rarity/reward/danger and keep fonts legible at small sizes.",
+    "**Minimal HUD, clear hierarchy.** Show only what matters now; surface the shop and next goal clearly without clutter."
+   ]
+  },
+  "monetization": {
+   "file": "05-monetization.md",
+   "name": "Monetization",
+   "videos": [
+    [
+     "hoMbv_R8AMU",
+     "inferred",
+     "Official RDC 2026 session with top creators' monetization lessons; layered products (passes, dev products, subscriptions) tied to gameplay value."
+    ],
+    [
+     "zW0VdnOqxMk",
+     "inferred",
+     "The two easiest ways the creator found to earn Robux on Roblox, framed against low-effort tutorials; focus on proven product types."
+    ],
+    [
+     "LZOohZHsJus",
+     "inferred",
+     "Breakdown of a 38K-CCU game's strategy and products; revenue comes from retention and many purchase pathways, not one product."
+    ],
+    [
+     "KoGT6LokHBE",
+     "inferred",
+     "A 100-CCU game earned ~2M Robux: game passes and dev products that sold, and why retention/monetization depth beats raw CCU."
+    ],
+    [
+     "wKI3PBO3bB0",
+     "inferred",
+     "Small developer's year earning 23M Robux across games: many smaller titles, data-driven iteration, and focused products."
+    ],
+    [
+     "zoz3PSMqets",
+     "inferred",
+     "Monetization basics: game passes (one-time perks), developer products (repeatable), Premium payouts, and how to price them."
+    ],
+    [
+     "5uXLixtTgJM",
+     "inferred",
+     "Top monetization methods for Roblox games: passes, dev products, VIP/private servers, cosmetics, and limited-time offers."
+    ],
+    [
+     "-PoyiiGhoNo",
+     "inferred",
+     "Which developer products sold most in a $43K game and why: products that solve a pain at the moment players feel it."
+    ],
+    [
+     "r_p3iqil94Q",
+     "inferred",
+     "How to add monetization to your game: placement of shop/purchase prompts and the types of items that sell."
+    ],
+    [
+     "k4j5DsbQnHM",
+     "inferred",
+     "Eight psychological 'traps' behind Roblox spending (scarcity, anchoring, sunk cost...) - know them to use ethically or avoid."
+    ],
+    [
+     "n29WMYNTZHs",
+     "inferred",
+     "Scripting developer products correctly: ProcessReceipt, idempotent server-side granting, saving purchases."
+    ],
+    [
+     "8FIj3gmP5Ls",
+     "inferred",
+     "Selling developer products with ProfileStore so purchases are granted once and persist safely."
+    ],
+    [
+     "xNjI03CGkb4",
+     "known",
+     "F2P 'whale' monetization tricks explained; a cautionary look at manipulative designs and their reputational cost."
+    ],
+    [
+     "8xgnm6SynH4",
+     "inferred",
+     "Day with Roblox millionaire devs: teams treat games as businesses - data, updates, ads, and monetization tuning."
+    ],
+    [
+     "ZradA-cygP0",
+     "inferred",
+     "Real earnings of a 2k+ CCU game; shows revenue per CCU varies hugely with monetization design."
+    ],
+    [
+     "2Q4NqQikzsY",
+     "inferred",
+     "Realistic earnings ranges for Roblox games and what separates well- from poorly-monetized games."
+    ],
+    [
+     "hxjumUFspP0",
+     "inferred",
+     "How much Roblox developers actually make: a few hits earn most; most games earn little - plan for many attempts."
+    ],
+    [
+     "SUMTYryynss",
+     "inferred",
+     "DevEx walkthrough: converting earned Robux to real money, rates and requirements."
+    ],
+    [
+     "K-4fRBnN2Ek",
+     "inferred",
+     "Story of a game earning ~14M Robux in one week; how a viral spike plus ready monetization captured revenue."
+    ],
+    [
+     "LD7LGP10dRc",
+     "inferred",
+     "Small-scale reality check: three games, $130 of ads, ~9k visits - read straight from the dashboard."
+    ]
+   ],
+   "patterns": [
+    "**Sell pain-relievers and expression, not walls.** Best sellers remove friction (speed, auto-collect, protection, offline gains) or let players show off (cosmetics, rare items).",
+    "**Layer products.** Combine one-time game passes, repeatable developer products, and optional subscriptions/VIP servers at several price points.",
+    "**Consumables build habits.** Cheap repeatable products (boosts, refills) raise spending frequency more than one-off passes.",
+    "**Placement and timing matter.** Put offers where players are and when they feel the need (e.g. 'not enough coins' → shop), not as interrupting popups.",
+    "**Revenue per CCU varies 10-30x.** Monetization depth and retention, not player count, decide earnings.",
+    "**Server-authoritative, idempotent purchases.** Grant in ProcessReceipt on the server and persist safely - lost purchases destroy trust.",
+    "**No pay-to-win or manipulative pressure.** Creators and the critical videos agree: it kills retention and reputation."
+   ]
+  },
+  "fun": {
+   "file": "06-what-makes-a-game-fun.md",
+   "name": "What Makes a Game Fun (feel, pacing, risk/reward, novelty, social)",
+   "videos": [
+    [
+     "216_5nu4aVQ",
+     "known",
+     "Game feel = responsive controls + layered feedback (animation, particles, sound, screen shake, hit-pause); tune it until actions feel good on their own."
+    ],
+    [
+     "Fy0aCDmgnxg",
+     "known",
+     "'Juice it or lose it': the same game transformed by tweening, squash/stretch, particles, sound and shake - juice multiplies satisfaction cheaply."
+    ],
+    [
+     "AJdEqssNZ-U",
+     "known",
+     "Vlambeer's ~30 feel tricks: screen shake, hit-stop, big bullets/impacts, recoil/knockback, permanence (debris stays), sound punch."
+    ],
+    [
+     "7L1B5YaxxoA",
+     "known",
+     "Even a single button press becomes fun with anticipation, squash, particles, sound and reaction - feedback design matters more than content."
+    ],
+    [
+     "plj09H-aLOk",
+     "known",
+     "Quick wins for fun: tighten feedback, add variety and surprise, reduce downtime and frustration."
+    ],
+    [
+     "qCj9CZoAvFY",
+     "inferred",
+     "Ten concrete game-feel improvements: input buffering, coyote time, easing, camera work, impact frames, audio layering."
+    ],
+    [
+     "dwI5b-wRLic",
+     "known",
+     "Input randomness (before the player acts) creates interesting decisions; output randomness (after) can feel unfair - choose deliberately."
+    ],
+    [
+     "1ypOUn6rThM",
+     "known",
+     "Overjustification effect: heavy extrinsic rewards can make an intrinsically fun activity feel like a chore."
+    ],
+    [
+     "iIOIT3dCy5w",
+     "known",
+     "Think like a designer: start from the experience/feeling you want, then design mechanics that produce it."
+    ],
+    [
+     "FXqEykD5Ub4",
+     "known",
+     "Sakurai: risk and reward should scale together; letting players choose bigger risk for bigger payoff creates tension and excitement."
+    ],
+    [
+     "OdVkEOzdCPw",
+     "known",
+     "Sakurai: briefly pause (hit-stop/slow-mo) on big moments so players register and savor them."
+    ],
+    [
+     "TYh5SJb5gWk",
+     "known",
+     "Sakurai: alternate tension (squeeze) and release; relief after pressure is what makes peaks feel good."
+    ],
+    [
+     "5LScL4CWe5E",
+     "known",
+     "Pacing: vary intensity like a wave - build-up, peak, rest - to avoid fatigue and boredom."
+    ],
+    [
+     "ftiHgyFt72M",
+     "known",
+     "Keep players interested through pacing: introduce new mechanics/challenges regularly and give breathers between peaks."
+    ],
+    [
+     "2QJVGtKPjNc",
+     "known",
+     "Social mechanics are fun when players can cooperate, show off, and affect each other in meaningful but non-griefing ways."
+    ],
+    [
+     "h86g-XgUCA8",
+     "known",
+     "Intrinsic rewards (mastery, curiosity, expression) outlast extrinsic ones; use extrinsic rewards to point at intrinsic fun."
+    ],
+    [
+     "WggIdtrqgKg",
+     "known",
+     "Sid Meier: a game is a series of interesting decisions - trade-offs with no single obvious answer, made with enough information."
+    ],
+    [
+     "lkatr_a1OMQ",
+     "inferred",
+     "Psychology of fun: competence, autonomy, relatedness (self-determination theory), plus flow from balanced challenge."
+    ],
+    [
+     "78rPt0RsosQ",
+     "inferred",
+     "A designer's counterintuitive secret to fun: constraints and friction, used well, create challenge and meaning."
+    ],
+    [
+     "MYJBRWT7JGU",
+     "known",
+     "Crash Course on gaming psychology: flow, rewards, learning curves, and why mastery feels good."
+    ]
+   ],
+   "patterns": [
+    "**Juice the most-repeated action most.** Squash/stretch, particles, sound layers, small screen shake, number pop-ups and hit-pause make simple actions satisfying.",
+    "**Feedback before content.** Several talks show the same mechanic going from dull to fun purely through feedback polish.",
+    "**Risk/reward and interesting decisions.** Let players choose bigger risk for bigger payoff; avoid single obvious best choices.",
+    "**Pacing in waves.** Alternate tension and release; introduce new mechanics regularly; stop for big moments.",
+    "**Randomness with care.** Use input randomness for variety; make output randomness feel fair (pity, visible odds).",
+    "**Intrinsic > extrinsic.** Mastery, curiosity, expression and social connection sustain fun; rewards should point at them, not replace them.",
+    "**Social moments.** Cooperation, showing off and friendly competition create memorable, shareable moments."
+   ]
+  }
+ }
+}
